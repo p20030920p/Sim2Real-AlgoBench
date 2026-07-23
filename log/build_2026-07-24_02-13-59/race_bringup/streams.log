@@ -1,0 +1,42 @@
+[0.019s] Invoking command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/zfy/桌面/project/race_ros2_ws/src/race_bringup -DCMAKE_INSTALL_PREFIX=/home/zfy/桌面/project/race_ros2_ws/install/race_bringup
+[0.175s] -- The C compiler identification is GNU 13.3.0
+[0.302s] -- The CXX compiler identification is GNU 13.3.0
+[0.331s] -- Detecting C compiler ABI info
+[0.427s] -- Detecting C compiler ABI info - done
+[0.434s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.435s] -- Detecting C compile features
+[0.435s] -- Detecting C compile features - done
+[0.448s] -- Detecting CXX compiler ABI info
+[0.567s] -- Detecting CXX compiler ABI info - done
+[0.574s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.575s] -- Detecting CXX compile features
+[0.575s] -- Detecting CXX compile features - done
+[0.594s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.766s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[0.927s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[1.070s] -- Added test 'lint_cmake' to check CMake code style
+[1.073s] -- Added test 'xmllint' to check XML markup files
+[1.076s] -- Configuring done (1.0s)
+[1.079s] -- Generating done (0.0s)
+[1.080s] -- Build files have been written to: /home/zfy/桌面/project/race_ros2_ws/build/race_bringup
+[1.088s] Invoked command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/zfy/桌面/project/race_ros2_ws/src/race_bringup -DCMAKE_INSTALL_PREFIX=/home/zfy/桌面/project/race_ros2_ws/install/race_bringup
+[1.089s] Invoking command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/zfy/桌面/project/race_ros2_ws/build/race_bringup -- -j16 -l16
+[1.142s] Invoked command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/zfy/桌面/project/race_ros2_ws/build/race_bringup -- -j16 -l16
+[1.143s] Invoking command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/zfy/桌面/project/race_ros2_ws/build/race_bringup
+[1.154s] -- Install configuration: ""
+[1.154s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/ament_index/resource_index/package_run_dependencies/race_bringup
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/ament_index/resource_index/parent_prefix_path/race_bringup
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/environment/ament_prefix_path.sh
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/environment/ament_prefix_path.dsv
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/environment/path.sh
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/environment/path.dsv
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/local_setup.bash
+[1.155s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/local_setup.sh
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/local_setup.zsh
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/local_setup.dsv
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/package.dsv
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/ament_index/resource_index/packages/race_bringup
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/cmake/race_bringupConfig.cmake
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/cmake/race_bringupConfig-version.cmake
+[1.156s] -- Installing: /home/zfy/桌面/project/race_ros2_ws/install/race_bringup/share/race_bringup/package.xml
+[1.195s] Invoked command in '/home/zfy/桌面/project/race_ros2_ws/build/race_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/zfy/桌面/project/race_ros2_ws/build/race_bringup
