@@ -1,0 +1,56 @@
+{
+  "run_id": "20260803_151651_001",
+  "status": "TIMEOUT",
+  "timestamp": "2026-08-03T15:16:51.448366+08:00",
+  "timing": {
+    "start_sim_ns": 17364000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 317500000000,
+    "official_navigation_seconds": 300.136,
+    "verified_completion_seconds": 300.136,
+    "official_wall_seconds": 1368.599222648,
+    "verified_wall_seconds": 1368.599222648,
+    "simulation_realtime_factor_observed": 0.21930160052209396,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 23.983040768121178,
+    "command_speed_max_mps": 0.6113189595049118,
+    "measured_speed_max_mps": 3.056594797140679,
+    "speed_tracking_mae_mps": 0.014604353245065432,
+    "speed_tracking_rmse_mps": 0.07282263967969095,
+    "speed_tracking_max_error_mps": 2.445275837635767,
+    "mean_relative_slip": 0.045331380879845604,
+    "max_relative_slip": 4.665002708266016,
+    "tracking_samples": 5551
+  },
+  "safety": {
+    "collision_events": 3,
+    "collision_pairs": {
+      "dynamic_obstacle_2::body::collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 51
+    },
+    "maximum_contact_depth_m": 0.0009220434785139342,
+    "minimum_lidar_clearance_m": 0.162844717502594
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": 1.2983412742614746,
+    "final_wall_range_error_m": 0.9583412742614745
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 15,
+      "SCANNING_360_FOR_GREEN_BOARD": 4,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 13,
+      "SEARCH_EXHAUSTED": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.0,
+      "PREPARING_MAP_SEARCH": 0.781,
+      "SCANNING_360_FOR_GREEN_BOARD": 16.071,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 207.92200000000003,
+      "SEARCH_EXHAUSTED": 75.36200000000001
+    }
+  }
+}

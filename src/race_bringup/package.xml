@@ -2,17 +2,23 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>race_bringup</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <version>0.1.0</version>
+  <description>Top-level launch files for the competition simulation.</description>
   <maintainer email="2495534260@qq.com">zfy</maintainer>
-  <license>TODO: License declaration</license>
-
+  <license>MIT</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-
-  <export>
-    <build_type>ament_cmake</build_type>
-  </export>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>omni_wheel_drive_controller</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>race_control</exec_depend>
+  <exec_depend>race_description</exec_depend>
+  <exec_depend>race_gazebo</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <export><build_type>ament_cmake</build_type></export>
 </package>

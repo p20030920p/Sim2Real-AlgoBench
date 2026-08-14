@@ -1,0 +1,17 @@
+green_board_detector:
+  ros__parameters:
+    image_topic: /camera/image_raw
+    hsv_low: [40, 45, 25]
+    hsv_high: [85, 255, 255]
+    min_area_ratio: 0.00045
+    min_fill_ratio: 0.50
+    min_aspect_ratio: 0.30
+    max_aspect_ratio: 1.20
+    stable_frames: 2
+    lost_frames: 2
+    use_clahe: true
+    clahe_clip_limit: 2.0
+    green_excess_min: 15
+    max_center_y_ratio: 0.90
+    clipped_marker_min_area_ratio: 0.03
+    publish_debug_image: false

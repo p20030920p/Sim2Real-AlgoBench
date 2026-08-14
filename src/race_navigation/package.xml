@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>race_navigation</name>
+  <version>0.1.0</version>
+  <description>Mapping, AMCL localization and holonomic Nav2 configuration for race track one.</description>
+  <maintainer email="2495534260@qq.com">zfy</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>nav2_amcl</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>nav2_mppi_controller</exec_depend>
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>nav2_smoother</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_theta_star_planner</exec_depend>
+  <exec_depend>nav2_behaviors</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>nav2_velocity_smoother</exec_depend>
+  <exec_depend>nav2_collision_monitor</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>race_bringup</exec_depend>
+  <exec_depend>race_vision</exec_depend>
+  <exec_depend>race_control</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

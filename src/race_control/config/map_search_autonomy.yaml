@@ -1,0 +1,25 @@
+map_search_autonomy:
+  ros__parameters:
+    use_sim_time: true
+    viewpoint_spacing: 1.00
+    viewpoint_clearance: 0.65
+    coverage_radius: 3.80
+    max_viewpoints: 8
+    scan_angular_speed: 1.60
+    scan_angle: 6.40
+    center_tolerance: 0.075
+    center_kp: 1.60
+    max_turn_speed: 1.10
+    approach_speed_max: 0.46
+    approach_speed_min: 0.07
+    approach_gain: 0.85
+    target_wall_range: 0.34
+    wall_range_tolerance: 0.04
+    final_min_area_ratio: 0.025
+    board_lost_timeout: 1.0
+    hold_seconds: 3.0
+    viewpoint_retry_rounds: 2
+    max_search_seconds: 285.0
+    initial_pose_x: 8.0727
+    initial_pose_y: 7.5312
+    initial_pose_yaw: -1.5708

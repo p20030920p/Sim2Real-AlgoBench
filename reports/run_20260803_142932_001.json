@@ -1,0 +1,48 @@
+{
+  "run_id": "20260803_142932_001",
+  "status": "INTERRUPTED",
+  "timestamp": "2026-08-03T14:29:32.871329+08:00",
+  "timing": {
+    "start_sim_ns": 121900000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 300000000000,
+    "official_navigation_seconds": 178.10000000000002,
+    "verified_completion_seconds": 178.10000000000002,
+    "official_wall_seconds": 953.4389960300001,
+    "verified_wall_seconds": 953.4389960300001,
+    "simulation_realtime_factor_observed": 0.1867974781203475,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 1.062250164131989e-16,
+    "command_speed_max_mps": 0.0,
+    "measured_speed_max_mps": 1.1724749968108983e-17,
+    "speed_tracking_mae_mps": 6.650180405812101e-19,
+    "speed_tracking_rmse_mps": 7.838563856540068e-19,
+    "speed_tracking_max_error_mps": 1.1724749968108983e-17,
+    "mean_relative_slip": 1.3300360811624174e-17,
+    "max_relative_slip": 2.3449499936217966e-16,
+    "tracking_samples": 3275
+  },
+  "safety": {
+    "collision_events": 0,
+    "collision_pairs": {},
+    "maximum_contact_depth_m": 0.0,
+    "minimum_lidar_clearance_m": 0.8355600237846375
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": 3.7330331802368164,
+    "final_wall_range_error_m": 3.3930331802368165
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.0,
+      "PREPARING_MAP_SEARCH": 178.10000000000002
+    }
+  }
+}

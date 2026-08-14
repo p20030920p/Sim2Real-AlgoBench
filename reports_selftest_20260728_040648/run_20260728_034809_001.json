@@ -1,0 +1,51 @@
+{
+  "run_id": "20260728_034809_001",
+  "status": "RESET_OR_ABORTED",
+  "timestamp": "2026-07-28T03:48:09.325978+08:00",
+  "timing": {
+    "start_sim_ns": 22534000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 29727000000,
+    "official_navigation_seconds": 7.1930000000000005,
+    "verified_completion_seconds": 7.1930000000000005,
+    "official_wall_seconds": 15.011097620000001,
+    "verified_wall_seconds": 15.011097620000001,
+    "simulation_realtime_factor_observed": 0.4791788170384305,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 5.71124285295943e-06,
+    "command_speed_max_mps": 0.0,
+    "measured_speed_max_mps": 6.609351532006673e-05,
+    "speed_tracking_mae_mps": 8.029764120149434e-07,
+    "speed_tracking_rmse_mps": 3.49234544753085e-06,
+    "speed_tracking_max_error_mps": 6.609351532006673e-05,
+    "mean_relative_slip": 1.605952824029887e-05,
+    "max_relative_slip": 0.0013218703064013346,
+    "tracking_samples": 720
+  },
+  "safety": {
+    "collision_events": 1,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 1699,
+      "dynamic_obstacle::body::collision <> omni_car::right_wheel_link::right_wheel_link_collision": 606,
+      "competition_map_dae::map_link::map_collision <> omni_car::right_wheel_link::right_wheel_link_collision": 4306,
+      "dynamic_obstacle::body::collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 1910,
+      "competition_map_dae::map_link::map_collision <> omni_car::left_wheel_link::left_wheel_link_collision": 1802
+    },
+    "maximum_contact_depth_m": 0.038412046432495295,
+    "minimum_lidar_clearance_m": 0.27693086862564087
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": null,
+    "final_wall_range_error_m": null
+  },
+  "states": {
+    "entry_counts": {},
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 7.1930000000000005
+    }
+  }
+}

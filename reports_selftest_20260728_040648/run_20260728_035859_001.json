@@ -1,0 +1,55 @@
+{
+  "run_id": "20260728_035859_001",
+  "status": "RESET_OR_ABORTED",
+  "timestamp": "2026-07-28T03:58:59.096786+08:00",
+  "timing": {
+    "start_sim_ns": 6505000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 154914000000,
+    "official_navigation_seconds": 148.40900000000002,
+    "verified_completion_seconds": 148.40900000000002,
+    "official_wall_seconds": 186.101974794,
+    "verified_wall_seconds": 186.101974794,
+    "simulation_realtime_factor_observed": 0.7974606404057609,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 41.474993084319955,
+    "command_speed_max_mps": 0.6400000000000001,
+    "measured_speed_max_mps": 1.2799999999945797,
+    "speed_tracking_mae_mps": 0.009508754521385155,
+    "speed_tracking_rmse_mps": 0.02763892468046904,
+    "speed_tracking_max_error_mps": 0.6399999999945796,
+    "mean_relative_slip": 0.015045999506881921,
+    "max_relative_slip": 1.0,
+    "tracking_samples": 14841
+  },
+  "safety": {
+    "collision_events": 3,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::right_wheel_link::right_wheel_link_collision": 88,
+      "competition_map_dae::map_link::map_collision <> omni_car::left_wheel_link::left_wheel_link_collision": 591,
+      "competition_map_dae::map_link::map_collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 2479,
+      "competition_map_dae::map_link::map_collision <> omni_car::front_wheel_link::front_wheel_link_collision": 41061
+    },
+    "maximum_contact_depth_m": 0.00035585567210245916,
+    "minimum_lidar_clearance_m": null
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": null,
+    "final_wall_range_error_m": null
+  },
+  "states": {
+    "entry_counts": {
+      "WAITING_FOR_START": 1,
+      "EXPLORE_AND_SEARCH": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.10300000000000001,
+      "WAITING_FOR_START": 83.147,
+      "EXPLORE_AND_SEARCH": 65.159
+    }
+  }
+}

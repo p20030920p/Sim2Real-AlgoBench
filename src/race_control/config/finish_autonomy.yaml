@@ -1,0 +1,65 @@
+finish_autonomy:
+  ros__parameters:
+    use_sim_time: true
+    control_rate_hz: 20.0
+    # Absolute chassis commands in SI units. These values are independent of
+    # Gazebo real-time factor: 0.50 means a requested 0.50 m/s in simulation.
+    explore_speed: 0.50
+    # In open space the controller can rise above explore_speed, but the
+    # lidar-derived braking envelope reduces it before obstacles and turns.
+    open_space_speed_max: 0.80
+    adaptive_braking_accel: 1.20
+    adaptive_clearance_margin: 0.42
+    turn_speed_reduction: 0.55
+    search_turn_speed: 0.80
+    obstacle_distance: 0.75
+    side_target_distance: 0.65
+    board_lost_timeout: 0.8
+    center_tolerance: 0.08
+    center_kp: 1.4
+    max_turn_speed: 1.00
+    approach_speed_max: 0.50
+    approach_speed_min: 0.06
+    approach_speed_gain: 0.90
+    approach_realign_threshold: 0.30
+    align_forward_speed: 0.25
+    align_drive_error_limit: 0.45
+    approach_sidestep_speed: 0.30
+    wall_follow_turn_limit: 0.55
+    wall_search_turn_bias: 0.20
+    # Lightweight online coverage memory. Repeated visits trigger a 360-degree
+    # camera scan and swap the followed wall, breaking deterministic loops.
+    coverage_cell_size: 0.60
+    coverage_revisit_threshold: 4
+    coverage_sample_period: 0.80
+    coverage_scan_speed: 1.10
+    coverage_scan_cooldown: 12.0
+    avoid_sidestep_speed: 0.28
+    avoid_turn_speed: 0.55
+    recovery_reverse_speed: 0.32
+    recovery_sidestep_speed: 0.32
+    recovery_turn_speed: 0.70
+    # Dead-end recognition uses occupied-ray ratios rather than a single
+    # minimum ray, so a moving column does not look like three solid walls.
+    dead_end_scan_distance: 1.20
+    dead_end_blocked_fraction: 0.30
+    dead_end_turn_speed: 0.90
+    dead_end_turn_tolerance: 0.12
+    dead_end_exit_speed: 0.50
+    dead_end_exit_distance: 1.00
+    dead_end_cooldown_seconds: 3.0
+    target_wall_range: 0.34
+    wall_range_tolerance: 0.035
+    final_min_area_ratio: 0.025
+    hold_seconds: 3.0
+    emergency_stop_distance: 0.42
+    ttc_stop_seconds: 1.4
+    obstacle_wait_seconds: 0.35
+    obstacle_clear_seconds: 0.35
+    max_linear_accel: 1.00
+    max_angular_accel: 2.50
+    stuck_command_speed: 0.10
+    stuck_measured_speed: 0.025
+    stuck_timeout: 1.4
+    scan_motion_window: 0.8
+    scan_motion_min_change: 0.025

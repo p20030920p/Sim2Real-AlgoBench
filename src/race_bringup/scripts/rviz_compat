@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+package_prefix="$(cd -- "${script_dir}/../.." && pwd)"
+patch_dir="${package_prefix}/share/race_bringup/rviz_compat"
+rviz_prefix="$(ros2 pkg prefix rviz_rendering)"
+override_prefix="${XDG_RUNTIME_DIR:-/tmp}/race_rviz_override_${ROS_DISTRO:-default}"
+
+mkdir -p \
+  "${override_prefix}/share/ament_index/resource_index/packages" \
+  "${override_prefix}/share/rviz_rendering/ogre_media"
+cp -a \
+  "${rviz_prefix}/share/rviz_rendering/ogre_media/." \
+  "${override_prefix}/share/rviz_rendering/ogre_media/"
+: > "${override_prefix}/share/ament_index/resource_index/packages/rviz_rendering"
+
+shader_dir="${override_prefix}/share/rviz_rendering/ogre_media/materials/glsl120"
+cp "${patch_dir}/indexed_8bit_image.vert" "${shader_dir}/indexed_8bit_image.vert"
+cp "${patch_dir}/indexed_8bit_image.frag" "${shader_dir}/indexed_8bit_image.frag"
+
+export AMENT_PREFIX_PATH="${override_prefix}:${AMENT_PREFIX_PATH:-}"
+exec "$(command -v rviz2)" "$@"

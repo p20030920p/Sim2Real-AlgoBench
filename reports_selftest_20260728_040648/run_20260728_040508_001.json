@@ -1,0 +1,53 @@
+{
+  "run_id": "20260728_040508_001",
+  "status": "RESET_OR_ABORTED",
+  "timestamp": "2026-07-28T04:05:08.327582+08:00",
+  "timing": {
+    "start_sim_ns": 8738000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 159800000000,
+    "official_navigation_seconds": 151.062,
+    "verified_completion_seconds": 151.062,
+    "official_wall_seconds": 185.699165002,
+    "verified_wall_seconds": 185.699165002,
+    "simulation_realtime_factor_observed": 0.8134770018937514,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 85.18818428089044,
+    "command_speed_max_mps": 0.6400000000000001,
+    "measured_speed_max_mps": 2.133333333160723,
+    "speed_tracking_mae_mps": 0.04197293906510326,
+    "speed_tracking_rmse_mps": 0.09085957975504094,
+    "speed_tracking_max_error_mps": 1.4933333331607228,
+    "mean_relative_slip": 0.0680953864355468,
+    "max_relative_slip": 2.333333333063629,
+    "tracking_samples": 15106
+  },
+  "safety": {
+    "collision_events": 7,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 17989,
+      "competition_map_dae::map_link::map_collision <> omni_car::right_wheel_link::right_wheel_link_collision": 151,
+      "competition_map_dae::map_link::map_collision <> omni_car::front_wheel_link::front_wheel_link_collision": 81832,
+      "competition_map_dae::map_link::map_collision <> omni_car::left_wheel_link::left_wheel_link_collision": 1353
+    },
+    "maximum_contact_depth_m": 0.0006124515103413941,
+    "minimum_lidar_clearance_m": null
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": null,
+    "final_wall_range_error_m": null
+  },
+  "states": {
+    "entry_counts": {
+      "EXPLORE_AND_SEARCH": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.34,
+      "EXPLORE_AND_SEARCH": 150.722
+    }
+  }
+}

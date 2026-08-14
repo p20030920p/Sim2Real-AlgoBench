@@ -1,0 +1,55 @@
+{
+  "run_id": "20260728_035254_001",
+  "status": "RESET_OR_ABORTED",
+  "timestamp": "2026-07-28T03:52:54.687464+08:00",
+  "timing": {
+    "start_sim_ns": 6306000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 97854000000,
+    "official_navigation_seconds": 91.548,
+    "verified_completion_seconds": 91.548,
+    "official_wall_seconds": 186.61844576700003,
+    "verified_wall_seconds": 186.61844576700003,
+    "simulation_realtime_factor_observed": 0.49056243944020966,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 32.448088841376745,
+    "command_speed_max_mps": 0.6400000000000001,
+    "measured_speed_max_mps": 2.332380757932039,
+    "speed_tracking_mae_mps": 0.032776738444871015,
+    "speed_tracking_rmse_mps": 0.0725089058145111,
+    "speed_tracking_max_error_mps": 2.099142682138227,
+    "mean_relative_slip": 0.1395449785092759,
+    "max_relative_slip": 15.999999999951298,
+    "tracking_samples": 9106
+  },
+  "safety": {
+    "collision_events": 16,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::front_wheel_link::front_wheel_link_collision": 35218,
+      "competition_map_dae::map_link::map_collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 7694
+    },
+    "maximum_contact_depth_m": 0.0005560559400465126,
+    "minimum_lidar_clearance_m": 0.08521374315023422
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": 0.19952501356601715,
+    "final_wall_range_error_m": -0.14047498643398287
+  },
+  "states": {
+    "entry_counts": {
+      "EXPLORE_AND_SEARCH": 43,
+      "TRACTION_RECOVERY": 20,
+      "YIELD_OR_BYPASS_OBSTACLE": 23
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.0,
+      "EXPLORE_AND_SEARCH": 49.817,
+      "TRACTION_RECOVERY": 28.943,
+      "YIELD_OR_BYPASS_OBSTACLE": 12.788
+    }
+  }
+}

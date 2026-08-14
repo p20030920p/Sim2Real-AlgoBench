@@ -1,0 +1,31 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    omni_drive_controller:
+      type: omni_wheel_drive_controller/OmniWheelDriveController
+
+omni_drive_controller:
+  ros__parameters:
+    wheel_names: [front_wheel_joint, left_wheel_joint, right_wheel_joint]
+    # Three wheel joint origins are about 0.1934 m from base center in the SW URDF.
+    robot_radius: 0.1934
+    # Measured from the exported STL bounds: diameter ~= 0.1272 m.
+    # The previous 0.0305 value was the wheel-center Z offset, not its radius.
+    wheel_radius: 0.06364
+    # Angular offset of the first omni wheel around the base. Front wheel is on +X axis.
+    wheel_offset: 0.0
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    enable_odom_tf: true
+    open_loop: false
+    position_feedback: true
+    cmd_vel_timeout: 0.5
+    tf_frame_prefix_enable: false
+    diagonal_covariance:
+      pose: [0.02, 0.02, 0.0, 0.0, 0.0, 0.05]
+      twist: [0.05, 0.05, 0.0, 0.0, 0.0, 0.10]

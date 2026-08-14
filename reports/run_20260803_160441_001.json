@@ -1,0 +1,61 @@
+{
+  "run_id": "20260803_160441_001",
+  "status": "COMPLETE",
+  "timestamp": "2026-08-03T16:04:41.432563+08:00",
+  "timing": {
+    "start_sim_ns": 15102000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 104000000000,
+    "official_navigation_seconds": 88.89800000000001,
+    "verified_completion_seconds": 88.89800000000001,
+    "official_wall_seconds": 508.979424671,
+    "verified_wall_seconds": 508.979424671,
+    "simulation_realtime_factor_observed": 0.17465931959324865,
+    "first_green_board_seconds": 62.211000000000006
+  },
+  "motion": {
+    "path_length_m": 26.939083335655997,
+    "command_speed_max_mps": 0.598961134225773,
+    "measured_speed_max_mps": 4.551009324913706,
+    "speed_tracking_mae_mps": 0.04320057870193208,
+    "speed_tracking_rmse_mps": 0.12826458780445843,
+    "speed_tracking_max_error_mps": 4.095908392422479,
+    "mean_relative_slip": 0.09887871230242952,
+    "max_relative_slip": 9.00000000000316,
+    "tracking_samples": 1638
+  },
+  "safety": {
+    "collision_events": 1,
+    "collision_pairs": {
+      "dynamic_obstacle_2::body::collision <> omni_car::left_wheel_link::left_wheel_link_collision": 3,
+      "dynamic_obstacle_2::body::collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 18
+    },
+    "maximum_contact_depth_m": 0.0010816013511798228,
+    "minimum_lidar_clearance_m": 0.18351636826992035
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": -0.014042668044567108,
+    "final_board_area_ratio": 0.6944612860679626,
+    "final_front_range_m": 0.3737383484840393,
+    "final_wall_range_error_m": 0.03373834848403928
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 4,
+      "SCANNING_360_FOR_GREEN_BOARD": 3,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 3,
+      "ALIGNING_WITH_GREEN_BOARD": 1,
+      "APPROACHING_YELLOW_FINISH_PAD": 1,
+      "HOLDING_STILL_FOR_3_SECONDS": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.006,
+      "PREPARING_MAP_SEARCH": 0.279,
+      "SCANNING_360_FOR_GREEN_BOARD": 12.011000000000001,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 49.917,
+      "ALIGNING_WITH_GREEN_BOARD": 0.621,
+      "APPROACHING_YELLOW_FINISH_PAD": 23.002000000000002,
+      "HOLDING_STILL_FOR_3_SECONDS": 3.0620000000000003
+    }
+  }
+}

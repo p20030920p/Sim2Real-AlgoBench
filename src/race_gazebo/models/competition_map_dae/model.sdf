@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="competition_map_dae">
+    <static>true</static>
+    <link name="map_link">
+      <!-- The SW model contains a 0.20 m floor slab. Sink it so the slab's
+           top surface is z=0 and sensors are above, rather than inside, it. -->
+      <pose>0 0 -0.2 0 0 0</pose>
+      <visual name="map_visual">
+        <geometry>
+          <mesh>
+            <!-- Rules-correct visual: the 0.8 m finish pad touches the marker wall. -->
+            <uri>model://competition_map_dae/meshes/competition_map_color_rules.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="map_collision">
+        <geometry>
+          <mesh>
+            <uri>model://competition_map_dae/meshes/competition_map_collision.obj</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

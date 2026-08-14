@@ -1,0 +1,58 @@
+{
+  "run_id": "20260813_161952_001",
+  "status": "COMPLETE",
+  "timestamp": "2026-08-13T16:19:52.455440+08:00",
+  "timing": {
+    "start_sim_ns": 24810000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 107668000000,
+    "official_navigation_seconds": 82.858,
+    "verified_completion_seconds": 82.858,
+    "official_wall_seconds": 441.816657851,
+    "verified_wall_seconds": 441.816657851,
+    "simulation_realtime_factor_observed": 0.18753933000856515,
+    "first_green_board_seconds": 70.296
+  },
+  "motion": {
+    "path_length_m": 26.951066467601667,
+    "command_speed_max_mps": 0.6012199408587917,
+    "measured_speed_max_mps": 4.810173549843456,
+    "speed_tracking_mae_mps": 0.054878117341585195,
+    "speed_tracking_rmse_mps": 0.14745536532290504,
+    "speed_tracking_max_error_mps": 4.329156194857166,
+    "mean_relative_slip": 0.13019188006839036,
+    "max_relative_slip": 8.999999999959588,
+    "tracking_samples": 1521
+  },
+  "safety": {
+    "collision_events": 0,
+    "collision_pairs": {},
+    "maximum_contact_depth_m": 0.0,
+    "minimum_lidar_clearance_m": 0.3713080883026123
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0007479211781173944,
+    "final_board_area_ratio": 0.69962078332901,
+    "final_front_range_m": 0.3713383376598358,
+    "final_wall_range_error_m": 0.03133833765983579
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 4,
+      "SCANNING_360_FOR_GREEN_BOARD": 4,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 3,
+      "ALIGNING_WITH_GREEN_BOARD": 1,
+      "APPROACHING_YELLOW_FINISH_PAD": 1,
+      "HOLDING_STILL_FOR_3_SECONDS": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.003,
+      "PREPARING_MAP_SEARCH": 0.29000000000000004,
+      "SCANNING_360_FOR_GREEN_BOARD": 14.106000000000002,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 55.897000000000006,
+      "ALIGNING_WITH_GREEN_BOARD": 0.562,
+      "APPROACHING_YELLOW_FINISH_PAD": 9.0,
+      "HOLDING_STILL_FOR_3_SECONDS": 3.0
+    }
+  }
+}

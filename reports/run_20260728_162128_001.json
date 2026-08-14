@@ -1,0 +1,58 @@
+{
+  "run_id": "20260728_162128_001",
+  "status": "INTERRUPTED",
+  "timestamp": "2026-07-28T16:21:28.235450+08:00",
+  "timing": {
+    "start_sim_ns": 33063000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 213651000000,
+    "official_navigation_seconds": 180.58800000000002,
+    "verified_completion_seconds": 180.58800000000002,
+    "official_wall_seconds": 340.450545767,
+    "verified_wall_seconds": 340.450545767,
+    "simulation_realtime_factor_observed": 0.5304382743553954,
+    "first_green_board_seconds": null
+  },
+  "motion": {
+    "path_length_m": 11.948339705910046,
+    "command_speed_max_mps": 0.6012241087571867,
+    "measured_speed_max_mps": 0.9704359464537881,
+    "speed_tracking_mae_mps": 0.007553080354217834,
+    "speed_tracking_rmse_mps": 0.029889015320741848,
+    "speed_tracking_max_error_mps": 0.5387050170754841,
+    "mean_relative_slip": 0.0201359876552136,
+    "max_relative_slip": 2.935530984369022,
+    "tracking_samples": 3339
+  },
+  "safety": {
+    "collision_events": 9,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::front_wheel_link::front_wheel_link_collision": 7,
+      "competition_map_dae::map_link::map_collision <> omni_car::base_footprint::base_footprint_fixed_joint_lump__base_link_collision": 2910,
+      "competition_map_dae::map_link::map_collision <> omni_car::right_wheel_link::right_wheel_link_collision": 1
+    },
+    "maximum_contact_depth_m": 0.00015620902785862256,
+    "minimum_lidar_clearance_m": null
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0,
+    "final_board_area_ratio": 0.0,
+    "final_front_range_m": null,
+    "final_wall_range_error_m": null
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 14,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 13,
+      "SCANNING_360_FOR_GREEN_BOARD": 1,
+      "SEARCH_EXHAUSTED": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 2.3440000000000003,
+      "PREPARING_MAP_SEARCH": 0.7360000000000001,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 49.076,
+      "SCANNING_360_FOR_GREEN_BOARD": 4.051,
+      "SEARCH_EXHAUSTED": 124.38100000000001
+    }
+  }
+}
