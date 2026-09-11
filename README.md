@@ -1,49 +1,110 @@
+<div align="center">
+
 # Sim2Real-AlgoBench
 
-**A three-wheeled omnidirectional robot autonomy benchmark built on ROS 2 Jazzy and Gazebo Sim 8.** One fixed task, one fixed interface contract, one fixed metric set — evaluated twice: in simulation and on a physical robot.
+**A three-wheeled omnidirectional robot autonomy benchmark on ROS 2 Jazzy and Gazebo Sim 8**
 
-<p align='center'>
-    <img src="docs/images/07_finish_reached.png" alt="Autonomous search and finish-pad approach" width="800"/>
-</p>
+One fixed task &nbsp;·&nbsp; one fixed interface contract &nbsp;·&nbsp; one fixed metric set &nbsp;—&nbsp; scored twice: in simulation and on a physical robot
 
-<p align='center'>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"/></a>
-    <img src="https://img.shields.io/badge/ROS%202-Jazzy-blue.svg" alt="ROS 2 Jazzy"/>
-    <img src="https://img.shields.io/badge/Ubuntu-24.04-orange.svg" alt="Ubuntu 24.04"/>
-    <img src="https://img.shields.io/badge/Gazebo%20Sim-8-lightgrey.svg" alt="Gazebo Sim 8"/>
-    <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt="Status: active"/>
-</p>
+[![ROS 2](https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white)](https://docs.ros.org/en/jazzy/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/24.04/)
+[![Gazebo](https://img.shields.io/badge/Gazebo%20Sim-8-F58113?logo=gazebo&logoColor=white)](https://gazebosim.org/)
+[![Nav2](https://img.shields.io/badge/Nav2-plugins-1E7BBF)](https://docs.nav2.org/)
+[![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
+[![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#algorithm-library)
 
-**中文文档：[README.zh-CN.md](README.zh-CN.md)**
+[The task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Quick start](#quick-start) &nbsp;•&nbsp; [Results](#results) &nbsp;•&nbsp; [Roadmap](#roadmap) &nbsp;•&nbsp; [Troubleshooting](#troubleshooting)
+
+*English &nbsp;|&nbsp; [中文](README.zh-CN.md)*
+
+</div>
 
 ---
 
-## Menu
+<p align="center">
+  <img src="docs/images/07_finish_reached.png" width="860" alt="Autonomous search and finish-pad approach"/>
+</p>
 
-- [**The task**](#the-task)
-- [**Features**](#features)
-- [**System overview**](#system-overview)
-- [**Package layout**](#package-layout)
-- [**Dependency**](#dependency)
-- [**Build**](#build)
-- [**Quick start**](#quick-start)
-- [**Re-mapping**](#re-mapping)
-- [**Topics and actions**](#topics-and-actions)
-- [**TF tree**](#tf-tree)
-- [**Parameters**](#parameters)
-- [**Results**](#results)
-- [**Roadmap**](#roadmap)
-- [**Adding a new algorithm**](#adding-a-new-algorithm) (must read)
-- [**Troubleshooting**](#troubleshooting)
-- [**Before running on a physical robot**](#before-running-on-a-physical-robot)
-- [**Acknowledgement**](#acknowledgement)
-- [**License**](#license)
+<p align="center">
+  <em>Fig. 1 — The robot reaches the finish pad after an autonomous search of the saved map. No goal pose was sent by hand and no finish coordinate is hard-coded.</em>
+</p>
+
+---
 
 ## The task
 
-The robot is placed at a published start pose on a known map and receives exactly one start signal. It must then **autonomously search** the map for a **green A4 marker** mounted on a wall, drive into the **yellow finish pad** in front of that marker, and stay still for **3 seconds**.
+The robot is placed at a published start pose on a known map and receives exactly one start signal. It must then **autonomously search** the map for a **green A4 marker** on a wall, drive into the **yellow finish pad** in front of it, and hold still for **3 seconds**.
 
-No goal pose is published to Nav2 by hand, and no finish coordinate is hard-coded. Detection is what ends the run, not geometry — which is what makes the simulation-to-hardware comparison meaningful, because perception is where the two domains differ most.
+No goal pose is published to Nav2 by hand, and no finish coordinate is hard-coded. The run ends on a **perceptual** condition rather than a geometric one — which is what makes the simulation-to-hardware comparison meaningful, because perception is where the two domains differ most.
+
+## Algorithm library
+
+> **The reason this repository exists.** Global planners are interchangeable: each one is a Nav2 plugin behind a shared interface, and **switching algorithm means editing one number**.
+
+```yaml
+# src/algo_bringup/config/algo_registry.yaml
+active:
+  planner: 1        # >>> change this number to change the algorithm <<<
+```
+
+Three layers keep the algorithms independent of ROS, so the same code runs in Gazebo and on the robot:
+
+| Layer | Package | Role |
+| :--- | :--- | :--- |
+| Algorithms | `algo_core` | Pure C++, **zero ROS dependency**. Offline unit-testable, reusable outside Nav2. |
+| Adapters | `algo_nav2_plugins` | One `nav2_core::GlobalPlanner` plugin serving every registered algorithm. |
+| Selection | `algo_bringup` | The index, parameter generation, and one behaviour tree per algorithm. |
+
+### Registered algorithms
+
+Measured on the race map (294 × 294 @ 0.05 m), planning from `(-3.0, -5.0)` to `(10.0, 7.0)`:
+
+| Idx | Algorithm | Path | Poses | Note |
+| :---: | :--- | :---: | ---: | :--- |
+| 0 | Dijkstra | ✅ | 21 | uniform-cost baseline, optimal |
+| 1 | **A\*** | ✅ | 23 | octile heuristic, the default |
+| 2 | Weighted A\* | ✅ | 29 | greedier, suboptimal, faster |
+| 3 | GBFS | ✅ | 22 | fastest to a solution |
+| 4 | JPS | ❌ | — | **known defect** — see below |
+| 5 | **Theta\*** | ✅ | **8** | any-angle, no grid staircasing |
+| 6 | **D\* Lite** | ✅ | 19 | incremental replanning |
+| 7 | Nav2 Theta\* | ✅ | 394 | incumbent baseline, for comparison |
+
+Theta\* covers the route in **8 poses against A\*'s 23** — that is any-angle planning removing the staircase, visible as a number.
+
+> **Known defect.** JPS reports `NO_VALID_PATH` on the race map although A\* finds a route under the same cost model, so its pruning is wrong. It passes the synthetic self test, which is why the bug only surfaced on the real map. It is flagged in the registry and **must not be used for reported results**.
+
+### Different algorithms for different situations
+
+All algorithms stay loaded at once, so no algorithm switch costs a restart. Three selection paths:
+
+| Path | Mechanism |
+| :--- | :--- |
+| **Per request** | `ComputePathToPose` carries a `planner_id` field — pick an algorithm per goal. |
+| **Per situation** | `NavigateToPose` has no planner id, but it **does** carry a `behavior_tree` field, so one behaviour tree per algorithm is generated with `planner_id` baked in. |
+| **Standalone** | `algo_core::Registry::instance().create("theta_star")` — no ROS node required. |
+
+The situation mapping lives in the same registry:
+
+```yaml
+selection:
+  stress_world: "P6_d_star_lite"            # moving obstacles -> incremental replanning
+  long_range_m: 8.0
+  long_range_planner: "P2_weighted_astar"   # long open traversals -> greedier search
+  narrow_passage_planner: "P5_theta_star"   # corridors -> any-angle
+```
+
+See [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) for the full guide, including how to add an algorithm in three steps without touching any existing file.
+
+## Demonstration
+
+<p align="center">
+  <img src="docs/media/dynamic_obstacle.gif" width="720" alt="Stress-world run: Gazebo on the left, the replanned path in RViz on the right"/>
+</p>
+
+<p align="center">
+  <em>Fig. 2 — Stress world. Left: Gazebo Sim, with <code>dynamic_obstacle_1</code> and <code>dynamic_obstacle_2</code> in the entity tree. Right: the path Nav2 is replanning as the obstacles move. Recorded at 8 fps; regenerate with <code>python3 tools/make_gif.py</code>.</em>
+</p>
 
 ## Features
 
@@ -52,7 +113,7 @@ No goal pose is published to Nav2 by hand, and no finish coordinate is hard-code
 - SLAM Toolbox mapping and Nav2 Map Saver for map persistence;
 - Prior grid map, published start pose, AMCL online localization;
 - Safe search viewpoints generated from the free-space connected component of the start pose;
-- Theta* any-angle global planning;
+- Theta\* any-angle global planning, plus seven interchangeable alternatives;
 - MPPI `Omni` local control with independent longitudinal, lateral and rotational motion;
 - Real-time LiDAR costmap updates handling both static and moving obstacles;
 - OpenCV green A4 marker detection;
@@ -64,8 +125,8 @@ No goal pose is published to Nav2 by hand, and no finish coordinate is hard-code
 
 ## System overview
 
-<p align='center'>
-    <img src="docs/images/08_autonomy_graph.png" alt="map_search_autonomy node graph" width="800"/>
+<p align="center">
+  <img src="docs/images/08_autonomy_graph.png" width="820" alt="map_search_autonomy node graph"/>
 </p>
 
 ```text
@@ -78,7 +139,7 @@ saved map + LiDAR + wheel odometry
  free-space connected-component viewpoint generation
              │ NavigateToPose action
              ▼
-   Theta* any-angle global planning
+   global planner  ──  interchangeable (index 0..7)
              │
              ▼
      MPPI (Omni) local control
@@ -119,14 +180,18 @@ Sim2Real-AlgoBench/
 ├── maps/                         # saved race_map.yaml / race_map.pgm
 ├── reports/                      # auto-generated run reports
 ├── diagnostics/                  # TF-tree and other diagnostic artefacts
-├── docs/                         # figures and media
+├── docs/                         # figures, media and the algorithm guide
+├── tools/                        # make_gif.py — regenerates the demo GIF
 └── src/
+    ├── algo_core/                # algorithms, no ROS dependency
+    ├── algo_nav2_plugins/        # Nav2 plugin adapters
+    ├── algo_bringup/             # algorithm index, params, behaviour trees
     ├── race_description/         # URDF, meshes, sensors, ros2_control
-    ├── race_gazebo/              # map models, nominal & stress worlds, moving obstacles
-    ├── race_bringup/             # Gazebo, robot, controllers, bridge, RViz assembly
-    ├── race_navigation/          # SLAM, AMCL, Nav2 configuration and the launch entry
+    ├── race_gazebo/              # map models, nominal & stress worlds
+    ├── race_bringup/             # Gazebo, robot, controllers, bridge, RViz
+    ├── race_navigation/          # SLAM, AMCL, Nav2 configuration, launch entry
     ├── race_vision/              # green A4 finish marker detection
-    └── race_control/             # one-button start, autonomy state machine, mux, metrics
+    └── race_control/             # one-button start, state machine, mux, metrics
 ```
 
 | Package | Role |
@@ -134,8 +199,8 @@ Sim2Real-AlgoBench/
 | `race_description` | `base_footprint`, `base_link`, three wheels, `lidar_link`, `camera_link`, collision bodies and the Gazebo `ros2_control` hardware interface. |
 | `race_gazebo` | Colored competition scene, collision models, nominal world, stress world, low-traction / rough ground, varying illumination, two moving obstacles. |
 | `race_bringup` | Starts Gazebo, spawns the robot, loads `joint_state_broadcaster` and `omni_drive_controller`, publishes robot TF, bridges sensors, converts `Twist` to `TwistStamped`. |
-| `race_navigation` | SLAM Toolbox, Map Saver, AMCL, Nav2, Theta*, MPPI Omni, costmaps, velocity smoothing, collision monitoring and `competition.launch.py`. |
-| `race_vision` | Detects the green A4 marker using HSV, green excess, CLAHE, morphology and a consecutive-frame test; publishes validity, normalized horizontal offset and area ratio. |
+| `race_navigation` | SLAM Toolbox, Map Saver, AMCL, Nav2, Theta\*, MPPI Omni, costmaps, velocity smoothing, collision monitoring and `competition.launch.py`. |
+| `race_vision` | Detects the green A4 marker using HSV, green excess, CLAHE, morphology and a consecutive-frame test. |
 | `race_control` | `map_search_autonomy.py`, `twist_priority_mux.py`, `twist_to_twist_stamped.py`, `race_start_key.py`, `race_metrics.py`, `moving_obstacle.py`. |
 
 ## Dependency
@@ -146,7 +211,7 @@ Sim2Real-AlgoBench/
 | ROS 2 | Jazzy Jalisco |
 | Simulator | Gazebo Sim 8 (Harmonic series) |
 | Build | colcon, CMake, ament |
-| Navigation | Nav2, AMCL, Theta*, MPPI Omni |
+| Navigation | Nav2, AMCL, Theta\*, MPPI Omni |
 | Mapping | SLAM Toolbox |
 | Control | `ros2_control`, omnidirectional drive controller |
 | Vision | OpenCV, `cv_bridge`, `image_transport` |
@@ -177,98 +242,88 @@ source ~/Sim2Real-AlgoBench/install/setup.bash
 
 ## Quick start
 
-### 1. Launch simulation, localization, navigation, vision and reporting
+<table>
+<tr><th align="left">1 — Launch the full task</th></tr>
+<tr><td>
 
 ```bash
 ros2 launch race_navigation competition.launch.py \
-  headless:=false \
-  nav_rviz:=true \
-  stress:=true
+  headless:=false nav_rviz:=true stress:=true
 ```
 
-| Argument | Effect |
-| :--- | :--- |
-| `headless:=false` | Shows Gazebo. Keep `false` for the perception task. |
-| `nav_rviz:=true` | Opens the Nav2 RViz view for observation only. |
-| `stress:=true` | Enables moving obstacles, low-traction / rough ground and varying illumination. Use `stress:=false` for functional verification. |
+`headless:=false` shows Gazebo (required for the perception task); `nav_rviz:=true` opens the Nav2 RViz view for observation; `stress:=true` enables moving obstacles, low-traction ground and varying illumination. Use `stress:=false` for functional checks.
 
-Wait until you see:
+Wait for `Saved-map search autonomy ready; waiting for one-button start.`
 
-```text
-Saved-map search autonomy ready; waiting for one-button start.
-Managed nodes are active
-```
-
-### 2. One-button start
-
-In a second terminal:
+</td></tr>
+<tr><th align="left">2 — Start with one button</th></tr>
+<tr><td>
 
 ```bash
 ros2 run race_control race_start_key
 ```
 
-Press **space or enter exactly once**. The key node publishes `/race/start=true` and exits normally; the autonomy task keeps running.
-
-For scripted runs:
+Press **space or enter exactly once**. For scripted runs:
 
 ```bash
 ros2 topic pub --once /race/start std_msgs/msg/Bool "{data: true}"
 ```
 
-### 3. Watch the state machine
+</td></tr>
+<tr><th align="left">3 — Watch the state machine</th></tr>
+<tr><td>
 
 ```bash
 ros2 topic echo /race/state \
-  --qos-reliability reliable \
-  --qos-durability transient_local
+  --qos-reliability reliable --qos-durability transient_local
 ```
 
-```text
-WAITING_FOR_ONE_BUTTON_START
-PREPARING_MAP_SEARCH
-NAVIGATING_TO_SEARCH_VIEWPOINT
-SCANNING_360_FOR_GREEN_BOARD
-ALIGNING_WITH_GREEN_BOARD
-APPROACHING_YELLOW_FINISH_PAD
-HOLDING_STILL_FOR_3_SECONDS
-COMPLETE
-SEARCH_EXHAUSTED
+`WAITING_FOR_ONE_BUTTON_START` → `PREPARING_MAP_SEARCH` → `NAVIGATING_TO_SEARCH_VIEWPOINT` → `SCANNING_360_FOR_GREEN_BOARD` → `ALIGNING_WITH_GREEN_BOARD` → `APPROACHING_YELLOW_FINISH_PAD` → `HOLDING_STILL_FOR_3_SECONDS` → `COMPLETE`, or `SEARCH_EXHAUSTED`.
+
+</td></tr>
+<tr><th align="left">4 — Benchmark the algorithms on their own</th></tr>
+<tr><td>
+
+```bash
+ros2 launch algo_bringup algo_planner_bench.launch.py
 ```
 
-### 4. Reset
+Brings up only a map server and a planner server with **every** registered algorithm, so algorithms can be compared on the race map without running the whole scenario. Override the index without editing the file:
+
+```bash
+ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
+```
+
+</td></tr>
+</table>
+
+### Reset
 
 ```bash
 ros2 topic pub --once /race/reset std_msgs/msg/Bool "{data: true}"
 ```
 
-This cancels the active goal, publishes zero velocity and returns to the waiting state. To restore the robot to its physical start pose, exit and relaunch the whole stack.
+Cancels the active goal, publishes zero velocity and returns to the waiting state. To restore the robot to its physical start pose, exit and relaunch the stack.
 
-### Gallery
+## Gallery
 
 | SLAM mapping | Map saved |
 | :---: | :---: |
 | ![SLAM mapping](docs/images/01_mapping.png) | ![Saved PGM map](docs/images/02_map_saved.png) |
-
-| Nav2 waypoint debug | One-button autonomous search |
-| :---: | :---: |
+| **Nav2 waypoint debug** | **One-button autonomous search** |
 | ![Nav2 waypoint navigation](docs/images/03_nav2_navigation.png) | ![Autonomous search](docs/images/04_autonomy_simulation.png) |
-
-| Stress world | TF tree |
-| :---: | :---: |
+| **Stress world** | **TF tree** |
 | ![Moving obstacles and varying illumination](docs/images/05_stress_world.png) | ![TF tree](docs/images/06_tf_tree.png) |
-
-[▶ Watch the moving-obstacle avoidance video](docs/media/dynamic_obstacle.mp4)
 
 ## Re-mapping
 
 When the fixed obstacle layout changes, start the mapping chain:
 
 ```bash
-ros2 launch race_navigation mapping.launch.py \
-  headless:=false rviz:=true
+ros2 launch race_navigation mapping.launch.py headless:=false rviz:=true
 ```
 
-In a second terminal:
+In a second terminal, drive the robot around:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -276,7 +331,7 @@ source ~/Sim2Real-AlgoBench/install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
-Once the map is complete, save it:
+Save once the map is complete:
 
 ```bash
 mkdir -p ~/Sim2Real-AlgoBench/maps
@@ -287,7 +342,7 @@ ros2 service call /map_saver/save_map nav2_msgs/srv/SaveMap \
 
 This produces `maps/race_map.pgm` and `maps/race_map.yaml`.
 
-## Topics and actions
+## Interface reference
 
 | Interface | Type / role |
 | :--- | :--- |
@@ -302,6 +357,7 @@ This produces `maps/race_map.pgm` and `maps/race_map.yaml`.
 | `/camera/image_raw` | raw camera image |
 | `/target/green_board_observation` | green marker detection result |
 | `/navigate_to_pose` | Nav2 navigation action |
+| `/compute_path_to_pose` | Nav2 planning action — carries `planner_id` |
 | `/cmd_vel_nav` | Nav2 velocity command |
 | `/cmd_vel_final` | visual-servoing velocity command |
 | `/cmd_vel` | arbitrated chassis command — **single publisher** |
@@ -309,10 +365,10 @@ This produces `maps/race_map.pgm` and `maps/race_map.yaml`.
 | `/omni_drive_controller/odom` | omnidirectional controller odometry |
 | `/tf`, `/tf_static` | dynamic and static transforms |
 
-## TF tree
+### TF tree
 
-<p align='center'>
-    <img src="docs/images/06_tf_tree.png" alt="Robot TF tree" width="600"/>
+<p align="center">
+  <img src="docs/images/06_tf_tree.png" width="560" alt="Robot TF tree"/>
 </p>
 
 ```text
@@ -358,46 +414,55 @@ One complete nominal-world run of the baseline, kept as a regression reference:
 
 ## Roadmap
 
-Algorithm slots, grouped by what they replace. `[x]` = baseline in place, `[ ]` = open.
+`[x]` = baseline in place, `[ ]` = open.
 
 **Baseline**
 
 - [x] Mapping — SLAM Toolbox
 - [x] Localization — AMCL
-- [x] Global planning — Theta* (`nav2_theta_star_planner`)
+- [x] Global planning — Theta\* + 7 interchangeable alternatives
 - [x] Local control — MPPI, `Omni` motion model
 - [x] Perception — HSV + green-excess threshold detector
 
-**Simulation track**
+**Planners**
 
-- [ ] Mapping / SLAM — `<algorithm>`
-- [ ] Localization — `<algorithm>`
-- [ ] Global planning — `<algorithm>`
-- [ ] Local control — `<algorithm>`
-- [ ] Perception — `<algorithm>`
-- [ ] Mission logic — `<algorithm>`
+- [x] Dijkstra, A\*, Weighted A\*, GBFS, Theta\*, D\* Lite
+- [ ] JPS — implemented but **broken on the race map**, needs debugging
+- [ ] RRT, RRT\*, Informed RRT\*, RRT-Connect
+- [ ] Hybrid A\*, Voronoi, ACO, GA, PSO
+
+**Controllers**
+
+- [ ] DWA, APF, RPP, PID, LQR, MPC — the adapter layer is not written yet
+- [ ] Multiple controllers selectable per goal via `controller_id`
 
 **Physical track**
 
 - [ ] Hardware bring-up and calibration record
-- [ ] Mapping / SLAM — `<algorithm>`
-- [ ] Localization — `<algorithm>`
-- [ ] Global planning — `<algorithm>`
-- [ ] Local control — `<algorithm>`
-- [ ] Perception — `<algorithm>`
+- [ ] Mapping / localization / planning / control / perception on the robot
 
 ## Adding a new algorithm
 
 **Read this before opening a pull request.** The point of this repository is that an algorithm can be swapped in *one* category while every other category keeps its baseline implementation, so results stay comparable.
 
 1. **Pick one category** — mapping, localization, global planning, local control, perception or mission logic.
-2. **Satisfy that category's interface** (see [Topics and actions](#topics-and-actions)). Add a package under `src/`, or a new workspace if the algorithm does not belong to this stack at all.
-3. **Never publish to `/cmd_vel` directly.** Write to `/cmd_vel_nav` or `/cmd_vel_final`; the mux arbitrates. One publisher on `/cmd_vel` is a contract, not a detail.
-4. **Do not modify the baseline packages** to make a contribution work. If that seems necessary, the interface is wrong — please open an issue instead.
-5. **Report the same metrics** as the baseline (`race_metrics`), and state any deviation from the protocol.
-6. **Update the [Roadmap](#roadmap)** and open a pull request naming the category you replaced.
+2. **Satisfy that category's interface.** For a planner, implement `algo_core::GridPlanner` and self-register:
 
-Metrics reported for every run, in either domain: completion time, time to first detection, path length, collision count, terminal speed, terminal wall clearance, marker horizontal error, and outcome.
+   ```cpp
+   class MyPlanner final : public algo_core::GridPlanner {
+   public:
+     std::string name() const override { return "my_planner"; }
+     algo_core::PlanResult plan(const algo_core::CostGrid & grid,
+                                const algo_core::Pose2D & start,
+                                const algo_core::Pose2D & goal) override;
+   };
+   ALGO_CORE_REGISTER(algo_core::MyPlanner, "my_planner")
+   ```
+
+3. **Add one entry to `algo_registry.yaml`** — the plugin class and behaviour trees are generated, so nothing else changes.
+4. **Never publish to `/cmd_vel` directly.** Write to `/cmd_vel_nav` or `/cmd_vel_final`; the mux arbitrates. One publisher on `/cmd_vel` is a contract, not a detail.
+5. **Do not modify the baseline packages** to make a contribution work. If that seems necessary, the interface is wrong — please open an issue instead.
+6. **Report the same metrics** as the baseline (`race_metrics`) and state any protocol deviation.
 
 ## Troubleshooting
 
@@ -418,6 +483,9 @@ ros2 topic hz /clock
 ros2 run tf2_ros tf2_echo map base_footprint
 ```
 
+**A planner reports `NO_VALID_PATH` (error 208) but the map looks fine.**
+Check `lethal_threshold`: the default `253` treats Nav2's inscribed-inflation cells as obstacles, which can close narrow passages. Lower it to `254` in the registry entry to plan through inflated cells.
+
 **Nav2 keeps recovering in front of a moving obstacle.**
 In the stress world a moving obstacle can transiently block a narrow passage. The autonomy node re-targets and starts another search round; it only enters `SEARCH_EXHAUSTED` near the 285 s limit.
 
@@ -430,7 +498,7 @@ ros2 topic echo /target/green_board_observation
 
 Vision thresholds must be re-calibrated for exposure, white balance, ambient light and actual distance on a physical robot.
 
-**Useful diagnostics**
+### Diagnostics
 
 ```bash
 ros2 node list
@@ -443,10 +511,6 @@ rqt_graph                       # use "Nodes/Topics (active)"
 
 mkdir -p diagnostics && cd diagnostics
 ros2 run tf2_tools view_frames
-xdg-open "$(ls -t frames*.pdf | head -n 1)"
-
-ros2 run tf2_ros tf2_echo map base_footprint
-ros2 run tf2_ros tf2_echo base_link lidar_link
 ```
 
 `omni_drive_controller` and `joint_state_broadcaster` should both be `active`.
@@ -462,6 +526,8 @@ A passing simulation does **not** license high-speed hardware operation. The fir
 - robot footprint, finish-pad coverage ratio and barrier stopping distance;
 - chassis hardware interface, serial/CAN and emergency stop;
 - collision geometry, floor friction, braking distance and speed cap.
+
+**The algorithm plugins need no changes for the robot.** They emit standard `geometry_msgs/Twist` including `linear.y`, so the existing chain (`/cmd_vel` → `TwistStamped` → `omni_drive_controller`) is untouched. Two things to watch: enable lateral velocity in `controller_server` (`min_y_velocity_threshold`), and re-tune the costmap inflation radius for real sensor noise.
 
 ## Acknowledgement
 
