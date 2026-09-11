@@ -1,0 +1,114 @@
+# =============================================================================
+#  ALGORITHM INDEX  /  算法索引
+# =============================================================================
+#  This file is the single place where the algorithm is chosen.
+#  改这一处，整套 Nav2 栈就跟着换算法。
+#
+#  `active.planner` is an index into `planners` below. Every entry is registered
+#  with Nav2 at the same time, so the choice can also be overridden per goal at
+#  runtime (see `selection` at the bottom) without reloading anything.
+# =============================================================================
+
+active:
+  # >>> 换算法只需要改这个数字 <<<
+  planner: 1          # index into `planners`
+  controller: 0       # index into `controllers` (reserved; see notes below)
+
+# -----------------------------------------------------------------------------
+# Global planners. `cost_scale` converts costmap cost into a traversal penalty:
+# 0.0 plans purely on the lethal/free classification, 1.0..5.0 increasingly
+# avoids inflated cells.
+# -----------------------------------------------------------------------------
+planners:
+  - index: 0
+    id: "P0_dijkstra"
+    algorithm: "dijkstra"
+    description: "Dijkstra — uniform-cost baseline, no heuristic. Slowest, optimal."
+    params: {cost_scale: 1.0}
+
+  - index: 1
+    id: "P1_astar"
+    algorithm: "astar"
+    description: "A* — octile heuristic on the 8-connected grid. The default."
+    params: {cost_scale: 1.0}
+
+  - index: 2
+    id: "P2_weighted_astar"
+    algorithm: "weighted_astar"
+    description: "Weighted A* — greedier, suboptimal but much faster on long searches."
+    params: {cost_scale: 1.0, weight: 2.5}
+
+  - index: 3
+    id: "P3_gbfs"
+    algorithm: "gbfs"
+    description: "Greedy Best-First Search — fastest to a solution, quality not guaranteed."
+    params: {cost_scale: 0.0}
+
+  - index: 4
+    id: "P4_jps"
+    algorithm: "jps"
+    status: "BROKEN — see notes below"
+    description: "Jump Point Search — prunes symmetric grid paths. Length-optimal, cost-blind."
+    notes: >
+      KNOWN ISSUE: the pruned search currently reports NO_VALID_PATH on the race
+      map even though A* finds a route with the same cost model, so the jump or
+      neighbour-pruning logic is wrong somewhere. It passes the synthetic self
+      test, which is why the bug went unnoticed until the real map was used.
+      Do not use it for reported results until it is fixed.
+    params: {cost_scale: 0.0, smooth: 1.0}
+
+  - index: 5
+    id: "P5_theta_star"
+    algorithm: "theta_star"
+    description: "Theta* — any-angle paths via line-of-sight relaxation, no grid staircasing."
+    params: {cost_scale: 1.0}
+
+  - index: 6
+    id: "P6_d_star_lite"
+    algorithm: "d_star_lite"
+    description: "D* Lite — incremental replanning. Use in the stress world with moving obstacles."
+    params: {cost_scale: 1.0}
+
+  - index: 7
+    id: "P7_nav2_theta_star"
+    algorithm: "nav2_theta_star_planner::ThetaStarPlanner"
+    external: true
+    description: "Nav2's own Theta* — the incumbent baseline for comparison."
+    params: {}
+
+# -----------------------------------------------------------------------------
+# Local controllers. Reserved: the controller adapters follow the same pattern
+# but are not implemented yet. `controller: 0` therefore selects the existing
+# MPPI Omni controller from race_navigation/config/nav2_params.yaml.
+# -----------------------------------------------------------------------------
+controllers:
+  - index: 0
+    id: "C0_mppi_omni"
+    algorithm: "nav2_mppi_controller::MPPIController"
+    external: true
+    description: "MPPI with the Omni motion model — the current baseline."
+    params: {}
+
+# -----------------------------------------------------------------------------
+# Situation -> algorithm mapping.
+#
+# This is the "different algorithms in different situations" part. The mission
+# node reads this and passes the matching planner id when it sends a goal, so no
+# restart is needed to switch. Keys are matched against the mission state.
+# -----------------------------------------------------------------------------
+selection:
+  # State machine state -> planner id
+  by_state:
+    PREPARING_MAP_SEARCH: "P1_astar"
+    NAVIGATING_TO_SEARCH_VIEWPOINT: "P1_astar"
+    SCANNING_360_FOR_GREEN_BOARD: "P1_astar"
+
+  # Stress world (moving obstacles): prefer incremental replanning.
+  stress_world: "P6_d_star_lite"
+
+  # Long open traversals: greedier search pays off.
+  long_range_m: 8.0
+  long_range_planner: "P2_weighted_astar"
+
+  # Narrow passages: any-angle paths track the corridor better than 8-connected.
+  narrow_passage_planner: "P5_theta_star"

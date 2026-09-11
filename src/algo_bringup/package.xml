@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>algo_bringup</name>
+  <version>0.1.0</version>
+  <description>
+    The algorithm index and its plumbing: algo_registry.yaml selects the
+    algorithm, this package turns that selection into Nav2 parameters and
+    behaviour trees so that switching algorithm is a configuration change.
+  </description>
+
+  <maintainer email="2655113627@qq.com">p20030920p</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <exec_depend>algo_nav2_plugins</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>race_navigation</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

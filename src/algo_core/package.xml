@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>algo_core</name>
+  <version>0.1.0</version>
+  <description>
+    ROS-free implementation of grid-based motion planning algorithms for the
+    Sim2Real-AlgoBench. Algorithms are registered by name and instantiated
+    through a factory, so switching algorithm is a configuration change rather
+    than a code change.
+  </description>
+
+  <maintainer email="2655113627@qq.com">p20030920p</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

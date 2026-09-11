@@ -1,0 +1,26 @@
+# colcon / ament build artefacts
+build/
+install/
+log/
+
+# catkin (week-style workspaces, kept for compatibility)
+devel/
+.catkin_tools/
+**/build/
+**/devel/
+**/install/
+**/log/
+**/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Generated at launch time by algo_bringup
+/tmp/algo_bringup_bt/

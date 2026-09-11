@@ -1,0 +1,16 @@
+<library path="algo_nav2_plugins">
+  <class name="algo_nav2_plugins/GridPlanner"
+         type="algo_nav2_plugins::GridPlannerPlugin"
+         base_class_type="nav2_core::GlobalPlanner">
+    <description>
+      Generic Nav2 global planner backed by the algo_core algorithm registry.
+      The `algorithm` parameter selects which registered algorithm runs, so one
+      plugin class exposes astar, dijkstra, gbfs, weighted_astar, jps,
+      theta_star, d_star_lite and anything registered later.
+
+      Register several named instances of this class in planner_plugins to keep
+      the algorithms loaded simultaneously and select one per request through
+      the ComputePathToPose planner_id field.
+    </description>
+  </class>
+</library>
