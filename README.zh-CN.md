@@ -103,7 +103,13 @@ selection:
 </p>
 
 <p align="center">
-  <em>图 2 —— 压力世界。左：Gazebo Sim，实体树中可见 <code>dynamic_obstacle_1</code> 与 <code>dynamic_obstacle_2</code>。右：障碍物移动时 Nav2 正在重新规划的路径。以 8 fps 录制，可用 <code>python3 tools/make_gif.py</code> 重新生成。</em>
+  <em>图 2 —— 压力世界。左：Gazebo Sim，实体树中可见 <code>dynamic_obstacle_1</code> 与 <code>dynamic_obstacle_2</code>。右：障碍物移动时 Nav2 正在重新规划的路径。</em>
+</p>
+
+<p align="center">
+  上方 GIF 为 640 px / 8 fps 的预览版，为便于页内直接播放而压缩。<br/>
+  <a href="docs/media/dynamic_obstacle.mp4"><b>⬇ 下载原始录像 &nbsp;—&nbsp; 1920 × 1080、60 fps、MP4、2.5 MB</b></a><br/>
+  <sub>可用 <code>python3 tools/make_gif.py</code> 从 MP4 重新生成预览。</sub>
 </p>
 
 ## 功能概览

@@ -103,7 +103,13 @@ See [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) for the full guide,
 </p>
 
 <p align="center">
-  <em>Fig. 2 — Stress world. Left: Gazebo Sim, with <code>dynamic_obstacle_1</code> and <code>dynamic_obstacle_2</code> in the entity tree. Right: the path Nav2 is replanning as the obstacles move. Recorded at 8 fps; regenerate with <code>python3 tools/make_gif.py</code>.</em>
+  <em>Fig. 2 — Stress world. Left: Gazebo Sim, with <code>dynamic_obstacle_1</code> and <code>dynamic_obstacle_2</code> in the entity tree. Right: the path Nav2 is replanning as the obstacles move.</em>
+</p>
+
+<p align="center">
+  The GIF above is a 640 px / 8 fps preview, downscaled so it plays inline.<br/>
+  <a href="docs/media/dynamic_obstacle.mp4"><b>⬇ Download the original recording &nbsp;—&nbsp; 1920 × 1080, 60 fps, MP4, 2.5 MB</b></a><br/>
+  <sub>Regenerate the preview from the MP4 with <code>python3 tools/make_gif.py</code>.</sub>
 </p>
 
 ## Features
