@@ -68,17 +68,17 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 
 ## 演示
 
-下面的搜索结果由 `algo_plan_dump` 在 race 地图上运行得到，使用的是 Nav2 插件所加载的同一份 `algo_core`。每个面板显示搜索展开的格子（按展开顺序着色），以及最终返回的路径。
+通过 `ComputePathToPose` 依次向七个规划器请求 race 地图上的路径，每返回一条就在 RViz 中画出。路径来自 Nav2 插件本身，不是另外绘制的示意图。
 
 <p align="center">
-  <img src="docs/media/planning_algorithms.gif" width="860" alt="六种规划器在 race 地图上的展开过程与路径"/>
+  <img src="docs/media/planning_algorithms.gif" width="720" alt="七种规划器的路径绘制在 RViz 的 race 地图上"/>
 </p>
 
 <p align="center">
-  <sub><a href="docs/media/planning_algorithms.mp4">下载原片（MP4，940 × 714）</a> &nbsp;·&nbsp; 用 <code>python3 tools/render_planning_demo.py</code> 重新生成</sub>
+  <sub><a href="docs/media/planning_algorithms.mp4">下载录像（MP4，720 × 720）</a> &nbsp;·&nbsp; 用 <code>tools/xwd_capture.py</code> 录制、<code>tools/assemble_rviz_gif.py</code> 合成</sub>
 </p>
 
-压力世界中的 Gazebo 运行。左侧是仿真画面，右侧是 Nav2 在移动障碍穿越通道时重新规划的路径。
+压力世界运行，桌面录制。左侧 Gazebo，右侧 RViz 显示 Nav2 发布的路径。录像为完整片段，未经裁剪。
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="压力世界：左侧 Gazebo，右侧 RViz 中重新规划的路径"/>

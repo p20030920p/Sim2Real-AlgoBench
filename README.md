@@ -68,17 +68,17 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ## Demos
 
-The searches below were run by `algo_plan_dump` against the race map, using the same `algo_core` the Nav2 plugin loads. Each panel shows the cells expanded, coloured by expansion order, and then the path returned.
+Seven planners are asked for a path on the race map through `ComputePathToPose`, and each is drawn in RViz as it returns. The paths come from the Nav2 plugins themselves, not from a redrawing of them.
 
 <p align="center">
-  <img src="docs/media/planning_algorithms.gif" width="860" alt="Six planners on the race map: expanded cells and resulting paths"/>
+  <img src="docs/media/planning_algorithms.gif" width="720" alt="Seven planner paths drawn in RViz on the race map"/>
 </p>
 
 <p align="center">
-  <sub><a href="docs/media/planning_algorithms.mp4">Download the original (MP4, 940 × 714)</a> &nbsp;·&nbsp; regenerate with <code>python3 tools/render_planning_demo.py</code></sub>
+  <sub><a href="docs/media/planning_algorithms.mp4">Download the recording (MP4, 720 × 720)</a> &nbsp;·&nbsp; recorded with <code>tools/xwd_capture.py</code>, assembled with <code>tools/assemble_rviz_gif.py</code></sub>
 </p>
 
-Stress world in Gazebo. The left window is the simulation, the right is the path Nav2 replans as the two moving obstacles cross the corridor.
+Stress-world run, recorded from the desktop. Gazebo on the left, RViz on the right showing the path Nav2 is publishing. The recording is complete, not cut down.
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="Stress-world run: Gazebo on the left, the replanned path in RViz on the right"/>
