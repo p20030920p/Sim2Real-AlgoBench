@@ -103,7 +103,7 @@ The same six searches side by side, colouring the expansion order:
 
 ### Stress world
 
-Stress-world run, recorded from the desktop. Gazebo on the left, RViz on the right showing the path Nav2 is publishing. The recording is complete, not cut down.
+The race scenario running: Gazebo on the left, RViz on the right. This is the stress world, which adds low-traction and rough-ground patches and two moving obstacles to the arena.
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="Stress-world run: Gazebo on the left, the replanned path in RViz on the right"/>

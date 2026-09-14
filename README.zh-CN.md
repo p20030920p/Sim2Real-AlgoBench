@@ -103,7 +103,7 @@ A\* 从车的起始位姿规划一条横穿场地的路线，车按这条路线�
 
 ### 压力世界
 
-压力世界运行，桌面录制。左侧 Gazebo，右侧 RViz 显示 Nav2 发布的路径。录像为完整片段，未经裁剪。
+比赛场景运行中：左侧 Gazebo，右侧 RViz。这是压力世界，场地中额外包含低附着地面、粗糙地面和两个移动障碍。
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="压力世界：左侧 Gazebo，右侧 RViz 中重新规划的路径"/>
