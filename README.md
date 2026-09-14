@@ -68,9 +68,21 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ## Demos
 
-### Planner search
+### Driving in Gazebo
 
-Each planner replays its own search in RViz: the cells it expanded, in the order it expanded them, then the path it returned. One recording per algorithm.
+A\* plans a route from the car's start pose to the far side of the arena, and the car drives it. This is the simulator running: Gazebo physics, the `omni_drive_controller`, the same `/cmd_vel` chain the race uses. The red line is the path the planner returned, drawn at its map coordinates; green marks the start, orange the goal.
+
+<p align="center">
+  <img src="docs/media/gazebo_drive.gif" width="560" alt="The car driving the A* route across the competition arena, seen from a top-down camera"/>
+</p>
+
+<p align="center">
+  <sub><a href="docs/media/gazebo_drive.mp4">Download (MP4)</a></sub>
+</p>
+
+### Planner search (replay)
+
+These six are not the simulator running. Each is a playback of the order in which the planner expanded cells, recorded once and replayed at a speed the eye can follow, because a planner returns in a few milliseconds. What they show honestly is the shape of each search; what they do not show is real-time execution.
 
 | | |
 | :---: | :---: |

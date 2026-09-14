@@ -197,3 +197,30 @@ export LD_LIBRARY_PATH=$PWD/install/algo_core/lib:$LD_LIBRARY_PATH
 python3 tools/render_planning_demo.py /tmp/plan.bin \
   src/race_navigation/maps/race_map.pgm docs/media/planning_algorithms.gif
 ```
+
+## 10. 仿真录制的环境要求
+
+录制 Gazebo 画面时踩到的坑，记录在此以免重复排查。
+
+**必须指定 `render_engine:=ogre`。** 默认的 `ogre2` 在本机（VMware 虚拟机 + Mesa 软件渲染）会在机器人带传感器生成时段错误，崩溃点在 `driCreateNewScreen3`：
+
+```bash
+ros2 launch race_bringup sim_ros2_control.launch.py headless:=true stress:=false render_engine:=ogre
+```
+
+**必须设置 `GZ_SIM_SYSTEM_PLUGIN_PATH`**，否则 gz sim 找不到 `gz_ros2_control-system`，世界加载失败：
+
+```bash
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
+```
+
+**`ros_gz_sim create` 的默认参数会覆盖 SDF 里的 `<pose>`。** 模型位姿要通过命令行传入，写在 SDF 里不生效：
+
+```bash
+ros2 run ros_gz_sim create -file cam.sdf -name topcam \
+  -x 3.65 -y 1.0 -z 13.0 -P 1.5708      # -P 是俯仰角，+90° 表示朝下
+```
+
+**相机在 stress 世界里不出图**，nominal 世界正常。需要录制时用 `stress:=false`。
+
+**俯视相机参数**：位于场地中心上方 13 m、俯仰角 +90°、水平视场 1.396 rad，可完整覆盖 14.7 m 见方的比赛场地。
