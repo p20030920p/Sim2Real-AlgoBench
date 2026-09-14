@@ -68,15 +68,28 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ## Demos
 
-Seven planners are asked for a path on the race map through `ComputePathToPose`, and each is drawn in RViz as it returns. The paths come from the Nav2 plugins themselves, not from a redrawing of them.
+### Planner search
+
+Each planner replays its own search in RViz: the cells it expanded, in the order it expanded them, then the path it returned. One recording per algorithm.
+
+| | |
+| :---: | :---: |
+| **Dijkstra** — floods the whole map | **A\*** — the heuristic cuts it down |
+| ![Dijkstra search](docs/media/rviz/dijkstra.gif) | ![A* search](docs/media/rviz/astar.gif) |
+| **Weighted A\*** — greedier, fewer cells | **GBFS** — narrowest frontier of the six |
+| ![Weighted A* search](docs/media/rviz/weighted_astar.gif) | ![GBFS search](docs/media/rviz/gbfs.gif) |
+| **Theta\*** — any-angle, no staircase | **D\* Lite** — almost nothing to expand |
+| ![Theta* search](docs/media/rviz/theta_star.gif) | ![D* Lite search](docs/media/rviz/d_star_lite.gif) |
+
+The same six searches side by side, colouring the expansion order:
+
+![Six planner searches side by side](docs/media/search_2d.gif)
 
 <p align="center">
-  <img src="docs/media/planning_algorithms.gif" width="720" alt="Seven planner paths drawn in RViz on the race map"/>
+  <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code></sub>
 </p>
 
-<p align="center">
-  <sub><a href="docs/media/planning_algorithms.mp4">Download the recording (MP4, 720 × 720)</a> &nbsp;·&nbsp; recorded with <code>tools/xwd_capture.py</code>, assembled with <code>tools/assemble_rviz_gif.py</code></sub>
-</p>
+### Stress world
 
 Stress-world run, recorded from the desktop. Gazebo on the left, RViz on the right showing the path Nav2 is publishing. The recording is complete, not cut down.
 

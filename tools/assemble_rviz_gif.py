@@ -100,6 +100,9 @@ def main() -> int:
                     help="3D viewport box in captured pixels. Detection is only reliable "
                          "when the panel does not contain dark UI, so passing this explicitly "
                          "is the dependable path.")
+    ap.add_argument("--box", default=None, metavar="L,T,R,B",
+                    help="content box relative to the viewport. Pass the same value for a "
+                         "set of recordings so every clip is framed identically.")
     ap.add_argument("--mp4", default=None)
     args = ap.parse_args()
 
@@ -115,7 +118,10 @@ def main() -> int:
         view = tuple(int(v) for v in args.viewport.split(","))
     else:
         view = viewport_box(raw)
-    box = content_box(raw, view)
+    if args.box:
+        box = tuple(int(v) for v in args.box.split(","))
+    else:
+        box = content_box(raw, view)
     print(f"viewport: {view}   content: {box}   size: {box[2] - box[0]}x{box[3] - box[1]}")
 
     vx0, vy0, _, _ = view

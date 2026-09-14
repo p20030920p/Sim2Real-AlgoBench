@@ -68,15 +68,28 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 
 ## 演示
 
-通过 `ComputePathToPose` 依次向七个规划器请求 race 地图上的路径，每返回一条就在 RViz 中画出。路径来自 Nav2 插件本身，不是另外绘制的示意图。
+### 规划器搜索过程
+
+每个规划器在 RViz 中回放自己的搜索过程：展开的格子、展开顺序，以及最终返回的路径。一个算法一段录像。
+
+| | |
+| :---: | :---: |
+| **Dijkstra** —— 铺满整张地图 | **A\*** —— 启发式大幅收窄 |
+| ![Dijkstra 搜索](docs/media/rviz/dijkstra.gif) | ![A* 搜索](docs/media/rviz/astar.gif) |
+| **Weighted A\*** —— 更贪心，格子更少 | **GBFS** —— 六者中前沿最窄 |
+| ![Weighted A* 搜索](docs/media/rviz/weighted_astar.gif) | ![GBFS 搜索](docs/media/rviz/gbfs.gif) |
+| **Theta\*** —— 任意角，无栅格阶梯 | **D\* Lite** —— 几乎没有展开 |
+| ![Theta* 搜索](docs/media/rviz/theta_star.gif) | ![D* Lite 搜索](docs/media/rviz/d_star_lite.gif) |
+
+同样六次搜索并排对比，按展开顺序着色：
+
+![六种规划器搜索并排对比](docs/media/search_2d.gif)
 
 <p align="center">
-  <img src="docs/media/planning_algorithms.gif" width="720" alt="七种规划器的路径绘制在 RViz 的 race 地图上"/>
+  <sub><a href="docs/media/search_2d.mp4">下载（MP4）</a> &nbsp;·&nbsp; 用 <code>tools/render_planning_demo.py</code> 渲染</sub>
 </p>
 
-<p align="center">
-  <sub><a href="docs/media/planning_algorithms.mp4">下载录像（MP4，720 × 720）</a> &nbsp;·&nbsp; 用 <code>tools/xwd_capture.py</code> 录制、<code>tools/assemble_rviz_gif.py</code> 合成</sub>
-</p>
+### 压力世界
 
 压力世界运行，桌面录制。左侧 Gazebo，右侧 RViz 显示 Nav2 发布的路径。录像为完整片段，未经裁剪。
 
