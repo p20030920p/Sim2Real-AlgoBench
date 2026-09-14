@@ -20,21 +20,41 @@ import time
 
 import cv2
 import numpy as np
+import json
+import math
+
 import rclpy
+from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 
 
 class Recorder(Node):
-    def __init__(self, topic: str, out_dir: str, fps: float, seconds: float):
+    def __init__(self, topic: str, out_dir: str, fps: float, seconds: float,
+                 spawn=(8.0727, 7.5312), spawn_yaw=-1.5708):
         super().__init__("camera_recorder")
         self.topic = topic
         self.out_dir = out_dir
         self.interval = 1.0 / fps
         self.seconds = seconds
         self.latest = None
+        self.odom = None
+        self.log = []
         self.count = 0
+        self.spawn = spawn
+        self.spawn_yaw = spawn_yaw
         self.create_subscription(Image, topic, self.on_image, 1)
+        self.create_subscription(Odometry, "/omni_drive_controller/odom", self.on_odom, 10)
+
+    def on_odom(self, msg: Odometry) -> None:
+        p = msg.pose.pose.position
+        q = msg.pose.pose.orientation
+        yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                         1.0 - 2.0 * (q.y * q.y + q.z * q.z))
+        c, s_ = math.cos(self.spawn_yaw), math.sin(self.spawn_yaw)
+        self.odom = (self.spawn[0] + c * p.x - s_ * p.y,
+                     self.spawn[1] + s_ * p.x + c * p.y,
+                     yaw + self.spawn_yaw)
 
     def on_image(self, msg: Image) -> None:
         frame = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, -1)
@@ -49,8 +69,13 @@ class Recorder(Node):
                 continue
             path = os.path.join(self.out_dir, f"f{self.count:05d}.png")
             cv2.imwrite(path, self.latest)
+            # Record where the car actually was for this frame, so the overlay
+            # can be checked against it rather than assumed correct.
+            self.log.append({"frame": self.count, "odom": self.odom})
             self.count += 1
             next_shot += self.interval
+        with open(os.path.join(self.out_dir, "odom.json"), "w", encoding="utf-8") as fh:
+            json.dump(self.log, fh)
         self.get_logger().info(f"wrote {self.count} frames to {self.out_dir}")
 
 

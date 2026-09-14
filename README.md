@@ -70,7 +70,7 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ### Driving in Gazebo
 
-A\* plans a route from the car's start pose to the far side of the arena, and the car drives it. This is the simulator running: Gazebo physics, the `omni_drive_controller`, the same `/cmd_vel` chain the race uses. The red line is the path the planner returned, drawn at its map coordinates; green marks the start, orange the goal.
+A\* planned a route across the competition arena and the car follows it, seen from a camera above the arena. The motion is the simulator's: Gazebo physics, the `omni_drive_controller`, the same `/cmd_vel` chain the race uses.
 
 <p align="center">
   <img src="docs/media/gazebo_drive.gif" width="560" alt="The car driving the A* route across the competition arena, seen from a top-down camera"/>

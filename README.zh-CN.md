@@ -70,7 +70,7 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 
 ### Gazebo 中实车行驶
 
-A\* 从车的起始位姿规划一条横穿场地的路线，车按这条路线行驶。**这是仿真在真实运行**：Gazebo 物理、`omni_drive_controller`、与比赛相同的 `/cmd_vel` 链路。红线是规划器返回的路径，按其地图坐标绘制；绿圈为起点，橙圈为终点。
+A\* 规划了一条横穿比赛场地的路线，车按这条路线行驶，由场地上方的相机拍摄。运动是仿真产生的：Gazebo 物理、`omni_drive_controller`、与比赛相同的 `/cmd_vel` 链路。
 
 <p align="center">
   <img src="docs/media/gazebo_drive.gif" width="560" alt="俯视镜头下车辆沿 A* 路线横穿比赛场地"/>
