@@ -52,6 +52,15 @@ add_executable(algo_core_selftest test/selftest.cpp)
 target_link_libraries(algo_core_selftest algo_core)
 install(TARGETS algo_core_selftest DESTINATION lib/${PROJECT_NAME})
 
+# ---------------------------------------------------------------------------
+# Dumps what each algorithm did on a real map (expansion order and path), so the
+# README demo is rendered from the shipped code rather than from a separate
+# implementation that could drift away from it.
+# ---------------------------------------------------------------------------
+add_executable(algo_plan_dump tools/plan_dump.cpp)
+target_link_libraries(algo_plan_dump algo_core)
+install(TARGETS algo_plan_dump DESTINATION lib/${PROJECT_NAME})
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto QUIET)
   if(ament_lint_auto_FOUND)

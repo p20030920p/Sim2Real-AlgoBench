@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#algorithm-library)
 
-[Task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Quick start](#quick-start) &nbsp;•&nbsp; [Results](#results) &nbsp;•&nbsp; [Docs](#docs)
+[Task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Demos](#demos) &nbsp;•&nbsp; [Quick start](#quick-start) &nbsp;•&nbsp; [Docs](#docs)
 
 *English &nbsp;|&nbsp; [中文](README.zh-CN.md)*
 
@@ -25,54 +25,67 @@
 
 ## The task
 
-The robot gets a published start pose and exactly one start signal. It must search a known map for a green A4 wall marker, drive onto the yellow pad in front of it, and hold still for 3 s. The run ends on a **perceptual** condition, not a geometric one — which is what makes the simulation-to-hardware comparison meaningful.
+The robot is given a start pose and one start signal. It searches a known map for a green A4 marker on a wall, drives onto the yellow pad in front of the marker, and stays still for 3 seconds.
+
+The run ends when the marker is detected, not when a coordinate is reached. Perception is therefore on the critical path in both domains, which is what makes the simulation-to-hardware comparison worth running.
 
 ## Algorithm library
 
-Global planners are interchangeable Nav2 plugins behind one interface. **Switching algorithm is editing one number:**
+The global planner is a Nav2 plugin, and seven implementations are interchangeable. The active one is chosen by one line:
 
 ```yaml
 # src/algo_bringup/config/algo_registry.yaml
 active:
-  planner: 1        # >>> the only line to change <<<
+  planner: 1
 ```
 
-Layered so the algorithms never touch ROS: `algo_core` (pure C++, unit-testable offline) → `algo_nav2_plugins` (one `nav2_core::GlobalPlanner` adapter) → `algo_bringup` (the index, parameters, behaviour trees).
+The algorithms live in `algo_core`, which has no ROS dependency and can be unit tested on its own. `algo_nav2_plugins` wraps them behind a single `nav2_core::GlobalPlanner` adapter. `algo_bringup` holds the index, the parameters and the behaviour trees.
 
-Measured on the race map (294 × 294 @ 0.05 m), planning `(-3.0, -5.0)` → `(10.0, 7.0)`:
+Measured on the race map (294 × 294 at 0.05 m), planning from `(-3.0, -5.0)` to `(10.0, 7.0)`:
 
-| Idx | Algorithm | Path | Poses | Note |
-| :---: | :--- | :---: | ---: | :--- |
-| 0 | Dijkstra | ✅ | 21 | optimal baseline |
-| 1 | **A\*** | ✅ | 23 | default |
-| 2 | Weighted A\* | ✅ | 29 | greedier, faster |
-| 3 | GBFS | ✅ | 22 | fastest to a solution |
-| 4 | JPS | ❌ | — | **known defect** |
-| 5 | **Theta\*** | ✅ | **8** | any-angle |
-| 6 | **D\* Lite** | ✅ | 19 | incremental replanning |
-| 7 | Nav2 Theta\* | ✅ | 394 | incumbent baseline |
+| Idx | Algorithm | Path | Poses | Cells expanded | Time |
+| :---: | :--- | :---: | ---: | ---: | ---: |
+| 0 | Dijkstra | yes | 21 | 55,578 | 5.0 ms |
+| 1 | **A\*** | yes | 23 | 26,442 | 5.3 ms |
+| 2 | Weighted A\* | yes | 29 | 9,025 | 1.4 ms |
+| 3 | GBFS | yes | 22 | 3,127 | 0.6 ms |
+| 4 | JPS | **no** | — | 5 | 0.1 ms |
+| 5 | **Theta\*** | yes | **8** | 20,694 | 30.5 ms |
+| 6 | **D\* Lite** | yes | 19 | 375 | 38.7 ms |
+| 7 | Nav2 Theta\* | yes | 394 | — | — |
 
-Theta\* covers the route in **8 poses against A\*'s 23** — any-angle planning removing the staircase, as a number.
+A\* expands 26,442 cells; D\* Lite expands 375, because it keeps its search between calls and only repairs what changed. Theta\* returns 8 poses where A\* returns 23; the difference is the grid staircase that any-angle planning removes.
 
-All algorithms stay loaded, so switching costs no restart:
+All registered planners stay loaded at once, and any of them can be selected per request:
 
-| Path | Mechanism |
+| Selection | Mechanism |
 | :--- | :--- |
 | Per request | `ComputePathToPose` carries a `planner_id` field |
-| Per situation | one behaviour tree per algorithm, selected via `behavior_tree` |
-| Standalone | `algo_core::Registry::instance().create("theta_star")` |
+| Per situation | one behaviour tree per algorithm, chosen through `behavior_tree` |
+| Outside Nav2 | `algo_core::Registry::instance().create("theta_star")` |
 
-> JPS reports `NO_VALID_PATH` on the race map although A\* finds a route under the same cost model, so its pruning is wrong. It is flagged in the registry and **must not be used for reported results**.
+JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map where A\* finds a route with the same cost model, so its pruning is incorrect. Do not use it for reported results.
 
-## Demonstration
+## Demos
+
+The searches below were run by `algo_plan_dump` against the race map, using the same `algo_core` the Nav2 plugin loads. Each panel shows the cells expanded, coloured by expansion order, and then the path returned.
+
+<p align="center">
+  <img src="docs/media/planning_algorithms.gif" width="860" alt="Six planners on the race map: expanded cells and resulting paths"/>
+</p>
+
+<p align="center">
+  <sub><a href="docs/media/planning_algorithms.mp4">Download the original (MP4, 940 × 714)</a> &nbsp;·&nbsp; regenerate with <code>python3 tools/render_planning_demo.py</code></sub>
+</p>
+
+Stress world in Gazebo. The left window is the simulation, the right is the path Nav2 replans as the two moving obstacles cross the corridor.
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="Stress-world run: Gazebo on the left, the replanned path in RViz on the right"/>
 </p>
 
 <p align="center">
-  <em>Stress world. Left: Gazebo, with <code>dynamic_obstacle_1/2</code> in the entity tree. Right: the path Nav2 replans as they move.</em><br/>
-  <sub>GIF is a 640 px / 8 fps preview — <a href="docs/media/dynamic_obstacle.mp4">download the original (1920 × 1080, 60 fps)</a>.</sub>
+  <sub><a href="docs/media/dynamic_obstacle.mp4">Download the original (MP4, 1920 × 1080 at 60 fps)</a> &nbsp;·&nbsp; regenerate with <code>python3 tools/make_gif.py</code></sub>
 </p>
 
 ## Gallery
@@ -101,7 +114,7 @@ ros2 run race_control race_start_key          # press space or enter once
 ros2 topic echo /race/state                   # observe the state machine
 ```
 
-Benchmark the algorithms alone, without the scenario:
+Run the planners alone, without the scenario. Every registered algorithm is loaded, and `planner_index` selects which one the terminal table reports as active:
 
 ```bash
 ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
@@ -109,13 +122,13 @@ ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
 
 ## Results
 
-One nominal-world baseline run, kept as a regression reference:
+One baseline run in the nominal world, kept as a regression reference:
 
 | Outcome | Time | First detection | Path | Collisions | Wall clearance |
 | :---: | ---: | ---: | ---: | ---: | ---: |
 | `COMPLETE` | 90.917 s | 63.033 s | 31.303 m | 0 | 0.3658 m |
 
-A single run on the machine of the time — a regression baseline, not a reportable result. Per-run records land in `reports/`.
+This is a single run on the machine of the time, not a benchmark result. Each run is written to `reports/` as a JSON file and a readable summary.
 
 ## Layout
 
@@ -125,7 +138,7 @@ src/
 ├── algo_nav2_plugins/    # Nav2 plugin adapters
 ├── algo_bringup/         # algorithm index, parameters, behaviour trees
 ├── race_description/     # URDF, meshes, sensors, ros2_control
-├── race_gazebo/          # competition map, nominal & stress worlds
+├── race_gazebo/          # competition map, nominal and stress worlds
 ├── race_bringup/         # Gazebo, robot, controllers, bridge, RViz
 ├── race_navigation/      # SLAM, AMCL, Nav2 configuration, launch entry
 ├── race_vision/          # green A4 marker detection
@@ -136,25 +149,38 @@ src/
 
 | Document | Contents |
 | :--- | :--- |
-| [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) | The algorithm library: adding an algorithm in three steps, selection, simulation and hardware use |
-| [`tools/make_gif.py`](tools/make_gif.py) | Regenerates the demo GIF from the source recording |
+| [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) | Adding an algorithm, the selection mechanism, simulation and hardware use |
+| [`tools/make_gif.py`](tools/make_gif.py) | Converts a screen recording into the GIFs above |
+| [`tools/render_planning_demo.py`](tools/render_planning_demo.py) | Renders the planning comparison from `algo_plan_dump` output |
 
-**Adding an algorithm** — implement `algo_core::GridPlanner`, self-register with `ALGO_CORE_REGISTER`, add one entry to `algo_registry.yaml`. The plugin class and behaviour trees are generated; nothing else changes. Contributions must not publish to `/cmd_vel` directly — write to `/cmd_vel_nav` or `/cmd_vel_final` and let the mux arbitrate.
+### Adding an algorithm
 
-**On hardware** the plugins need no changes: they emit standard `geometry_msgs/Twist` including `linear.y`, so the existing `/cmd_vel` → `TwistStamped` → `omni_drive_controller` chain is untouched. Enable lateral velocity in `controller_server`, and re-tune the costmap inflation radius for real sensor noise.
+1. Write a subclass of `algo_core::GridPlanner`.
+2. Register it with `ALGO_CORE_REGISTER`.
+3. Add an entry to `algo_registry.yaml`.
+
+The Nav2 plugin and the behaviour trees are generated from the registry, so no other file needs to change.
+
+### Velocity output
+
+A planner returns a path; it does not command the base. Velocity is published on `/cmd_vel_nav` or `/cmd_vel_final`, and `twist_priority_mux` selects one of the two to publish on `/cmd_vel`.
+
+### Running on the robot
+
+The plugins publish standard `geometry_msgs/Twist` including `linear.y`, so the same binary runs in Gazebo and on the vehicle. Two settings change: `min_y_velocity_threshold` in `controller_server` must allow lateral motion, and the costmap inflation radius needs re-tuning for the real LiDAR.
 
 ## Roadmap
 
 - [x] Baseline: SLAM Toolbox, AMCL, Theta\*, MPPI Omni, HSV marker detection
 - [x] Interchangeable planners: Dijkstra, A\*, Weighted A\*, GBFS, Theta\*, D\* Lite
-- [ ] JPS — implemented, **broken on the race map**
+- [ ] JPS: implement the pruning correctly
 - [ ] Sampling planners: RRT, RRT\*, Informed RRT\*, RRT-Connect
 - [ ] Controller adapters: DWA, APF, RPP, LQR, MPC
 - [ ] Hardware bring-up and calibration record
 
 ## Acknowledgement
 
-The simulation, baseline and original Chinese documentation were developed by [zfyyyyy](https://github.com/zfyyyyy). Built on ROS 2, Nav2, SLAM Toolbox, Gazebo and OpenCV.
+The simulation, the baseline and the original Chinese documentation were written by [zfyyyyy](https://github.com/zfyyyyy). This repository uses ROS 2, Nav2, SLAM Toolbox, Gazebo and OpenCV.
 
 If you use this work, please cite Nav2 ([Marathon 2, IROS 2020](https://arxiv.org/abs/2003.00368)), SLAM Toolbox ([JOSS 6(61):2783, 2021](https://joss.theoj.org/papers/10.21105/joss.02783)) and Theta\* ([JAIR 39:533–579, 2010](https://www.jair.org/index.php/jair/article/view/10676)).
 

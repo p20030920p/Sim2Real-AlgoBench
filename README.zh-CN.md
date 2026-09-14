@@ -2,14 +2,14 @@
 
 # Sim2Real-AlgoBench
 
-**三轮全向机器人自主导航基准 —— 一个任务、一套接口契约、一组指标，在仿真与实物上各评测一次。**
+**三轮全向机器人自主导航基准。一个任务、一套接口契约、一组指标，在仿真与实车上各评测一次。**
 
 [![ROS 2](https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white)](https://docs.ros.org/en/jazzy/)
 [![Gazebo](https://img.shields.io/badge/Gazebo%20Sim-8-F58113?logo=gazebo&logoColor=white)](https://gazebosim.org/)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#算法插件库)
 
-[任务定义](#任务定义) &nbsp;•&nbsp; [算法插件库](#算法插件库) &nbsp;•&nbsp; [快速开始](#快速开始) &nbsp;•&nbsp; [运行结果](#运行结果) &nbsp;•&nbsp; [文档](#文档)
+[任务定义](#任务定义) &nbsp;•&nbsp; [算法插件库](#算法插件库) &nbsp;•&nbsp; [演示](#演示) &nbsp;•&nbsp; [快速开始](#快速开始) &nbsp;•&nbsp; [文档](#文档)
 
 *[English](README.md) &nbsp;|&nbsp; 中文*
 
@@ -25,54 +25,67 @@
 
 ## 任务定义
 
-机器人获得一个公布的起点和恰好一次启动信号。它必须搜索已知地图找到墙面的绿色 A4 标志，驶入其前方的黄色区域，并静止 3 秒。任务以**感知**条件终止而非几何条件——这正是仿真到实物比较具有意义的原因。
+机器人获得一个起点和一次启动信号。它需要在已知地图中搜索墙面的绿色 A4 标志，驶入标志前方的黄色区域，并静止 3 秒。
+
+任务在识别到标志时结束，而不是到达某个坐标时结束。感知因此在两个域中都处于关键路径上，这也是仿真到实物比较值得做的原因。
 
 ## 算法插件库
 
-全局规划器是同一接口背后的可互换 Nav2 插件。**换算法只需要改一个数字：**
+全局规划器是 Nav2 插件，共有七种实现可以互换。当前使用哪一个由一行配置决定：
 
 ```yaml
 # src/algo_bringup/config/algo_registry.yaml
 active:
-  planner: 1        # >>> 唯一需要改的一行 <<<
+  planner: 1
 ```
 
-分层设计使算法完全不接触 ROS：`algo_core`（纯 C++，可离线单测）→ `algo_nav2_plugins`（一个 `nav2_core::GlobalPlanner` 适配器）→ `algo_bringup`（索引、参数、行为树）。
+算法本体在 `algo_core` 中，不依赖 ROS，可以单独做单元测试。`algo_nav2_plugins` 用一个 `nav2_core::GlobalPlanner` 适配器把它们接入 Nav2。`algo_bringup` 存放索引、参数和行为树。
 
-在 race 地图（294 × 294 @ 0.05 m）上从 `(-3.0, -5.0)` 规划到 `(10.0, 7.0)` 的实测结果：
+在 race 地图（294 × 294，分辨率 0.05 m）上从 `(-3.0, -5.0)` 规划到 `(10.0, 7.0)` 的实测结果：
 
-| 索引 | 算法 | 结果 | 点数 | 说明 |
-| :---: | :--- | :---: | ---: | :--- |
-| 0 | Dijkstra | ✅ | 21 | 最优基线 |
-| 1 | **A\*** | ✅ | 23 | 默认 |
-| 2 | Weighted A\* | ✅ | 29 | 更贪心，更快 |
-| 3 | GBFS | ✅ | 22 | 最快得到解 |
-| 4 | JPS | ❌ | — | **已知缺陷** |
-| 5 | **Theta\*** | ✅ | **8** | 任意角 |
-| 6 | **D\* Lite** | ✅ | 19 | 增量重规划 |
-| 7 | Nav2 Theta\* | ✅ | 394 | 对照基线 |
+| 索引 | 算法 | 找到路径 | 路径点数 | 展开格数 | 耗时 |
+| :---: | :--- | :---: | ---: | ---: | ---: |
+| 0 | Dijkstra | 是 | 21 | 55,578 | 5.0 ms |
+| 1 | **A\*** | 是 | 23 | 26,442 | 5.3 ms |
+| 2 | Weighted A\* | 是 | 29 | 9,025 | 1.4 ms |
+| 3 | GBFS | 是 | 22 | 3,127 | 0.6 ms |
+| 4 | JPS | **否** | — | 5 | 0.1 ms |
+| 5 | **Theta\*** | 是 | **8** | 20,694 | 30.5 ms |
+| 6 | **D\* Lite** | 是 | 19 | 375 | 38.7 ms |
+| 7 | Nav2 Theta\* | 是 | 394 | — | — |
 
-Theta\* 只用 **8 个点**走完全程，A\* 需要 23 个——任意角规划消除栅格阶梯的效果，是个数字。
+A\* 展开 26,442 格，D\* Lite 只展开 375 格，因为后者在多次调用之间保留搜索状态，只修复发生变化的部分。Theta\* 返回 8 个路径点，A\* 返回 23 个，差别来自任意角规划消除的栅格阶梯。
 
-所有算法同时常驻，切换不需重启：
+所有规划器同时保持加载，可以在每次请求时单独选择：
 
-| 路径 | 机制 |
+| 选择方式 | 机制 |
 | :--- | :--- |
-| 按请求 | `ComputePathToPose` 自带 `planner_id` 字段 |
+| 按请求 | `ComputePathToPose` 带有 `planner_id` 字段 |
 | 按情况 | 每个算法一棵行为树，通过 `behavior_tree` 选择 |
 | 脱离 Nav2 | `algo_core::Registry::instance().create("theta_star")` |
 
-> JPS 在 race 地图上返回 `NO_VALID_PATH`，而同样代价模型的 A\* 能找到路径，说明其剪枝逻辑有错。注册表中已标注，**修好前不要用它出结果**。
+JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同样代价模型的 A\* 能找到路径，说明剪枝逻辑有误。请不要用它产生结果。
 
 ## 演示
+
+下面的搜索结果由 `algo_plan_dump` 在 race 地图上运行得到，使用的是 Nav2 插件所加载的同一份 `algo_core`。每个面板显示搜索展开的格子（按展开顺序着色），以及最终返回的路径。
+
+<p align="center">
+  <img src="docs/media/planning_algorithms.gif" width="860" alt="六种规划器在 race 地图上的展开过程与路径"/>
+</p>
+
+<p align="center">
+  <sub><a href="docs/media/planning_algorithms.mp4">下载原片（MP4，940 × 714）</a> &nbsp;·&nbsp; 用 <code>python3 tools/render_planning_demo.py</code> 重新生成</sub>
+</p>
+
+压力世界中的 Gazebo 运行。左侧是仿真画面，右侧是 Nav2 在移动障碍穿越通道时重新规划的路径。
 
 <p align="center">
   <img src="docs/media/dynamic_obstacle.gif" width="720" alt="压力世界：左侧 Gazebo，右侧 RViz 中重新规划的路径"/>
 </p>
 
 <p align="center">
-  <em>压力世界。左：Gazebo，实体树中可见 <code>dynamic_obstacle_1/2</code>。右：障碍物移动时 Nav2 重新规划的路径。</em><br/>
-  <sub>GIF 为 640 px / 8 fps 预览 —— <a href="docs/media/dynamic_obstacle.mp4">下载原片（1920 × 1080、60 fps）</a>。</sub>
+  <sub><a href="docs/media/dynamic_obstacle.mp4">下载原片（MP4，1920 × 1080，60 fps）</a> &nbsp;·&nbsp; 用 <code>python3 tools/make_gif.py</code> 重新生成</sub>
 </p>
 
 ## 运行截图
@@ -101,7 +114,7 @@ ros2 run race_control race_start_key          # 按一次空格或回车
 ros2 topic echo /race/state                   # 观察状态机
 ```
 
-不起整个场景，单独横评算法：
+只运行规划器，不起整个场景。此时所有已注册算法都会加载，`planner_index` 决定终端表格中显示哪一个为当前算法：
 
 ```bash
 ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
@@ -115,17 +128,17 @@ ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
 | :---: | ---: | ---: | ---: | ---: | ---: |
 | `COMPLETE` | 90.917 s | 63.033 s | 31.303 m | 0 | 0.3658 m |
 
-这是当时机器上的**单次**运行，属于回归基线而非可报告的基准结果。每次运行的记录写入 `reports/`。
+这是当时机器上的单次运行，不是可报告的基准结果。每次运行会写入 `reports/`，包含 JSON 文件和一份可读的汇总。
 
 ## 目录结构
 
 ```text
 src/
-├── algo_core/            # 算法本体，无 ROS 依赖
+├── algo_core/            # 算法本体，不依赖 ROS
 ├── algo_nav2_plugins/    # Nav2 插件适配层
 ├── algo_bringup/         # 算法索引、参数、行为树
 ├── race_description/     # URDF、网格、传感器、ros2_control
-├── race_gazebo/          # 比赛地图、普通/压力世界
+├── race_gazebo/          # 比赛地图、普通世界与压力世界
 ├── race_bringup/         # Gazebo、机器人、控制器、桥接、RViz
 ├── race_navigation/      # SLAM、AMCL、Nav2 配置、启动入口
 ├── race_vision/          # 绿色 A4 标志识别
@@ -136,27 +149,40 @@ src/
 
 | 文档 | 内容 |
 | :--- | :--- |
-| [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) | 算法插件库：三步接入新算法、选择机制、仿真与实车用法 |
-| [`tools/make_gif.py`](tools/make_gif.py) | 从原始录像重新生成演示 GIF |
+| [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) | 接入新算法、选择机制、仿真与实车用法 |
+| [`tools/make_gif.py`](tools/make_gif.py) | 把录屏转换为上面的 GIF |
+| [`tools/render_planning_demo.py`](tools/render_planning_demo.py) | 根据 `algo_plan_dump` 的输出渲染规划对比动画 |
 
-**接入新算法**——实现 `algo_core::GridPlanner`、用 `ALGO_CORE_REGISTER` 自注册、在 `algo_registry.yaml` 加一条。插件类和行为树会自动生成，不需要改别的。贡献算法**不得**直接向 `/cmd_vel` 发布，写入 `/cmd_vel_nav` 或 `/cmd_vel_final`，由仲裁器裁决。
+### 接入新算法
 
-**上实车**插件无需任何改动：它们输出标准的 `geometry_msgs/Twist`（含 `linear.y`），现有 `/cmd_vel` → `TwistStamped` → `omni_drive_controller` 链路完全不用碰。需在 `controller_server` 中放开横向速度，并针对真实传感器噪声重新标定代价地图膨胀半径。
+1. 编写 `algo_core::GridPlanner` 的子类。
+2. 用 `ALGO_CORE_REGISTER` 注册算法名。
+3. 在 `algo_registry.yaml` 中新增一条记录。
+
+Nav2 插件和行为树由注册表生成，不需要改动其他文件。
+
+### 速度输出
+
+规划器只返回路径，不直接控制底盘。速度发布到 `/cmd_vel_nav` 或 `/cmd_vel_final`，由 `twist_priority_mux` 选择其中一路发布到 `/cmd_vel`。
+
+### 在实车上运行
+
+插件发布标准的 `geometry_msgs/Twist`，包含 `linear.y`，因此仿真和实车使用同一份二进制。需要改两处设置：`controller_server` 的 `min_y_velocity_threshold` 要允许横向运动，代价地图的膨胀半径要根据实际雷达噪声重新调整。
 
 ## 路线图
 
 - [x] 基线：SLAM Toolbox、AMCL、Theta\*、MPPI Omni、HSV 标志检测
 - [x] 可互换规划器：Dijkstra、A\*、Weighted A\*、GBFS、Theta\*、D\* Lite
-- [ ] JPS —— 已实现，但在 race 地图上**失败**
+- [ ] JPS：修正剪枝逻辑
 - [ ] 采样类规划器：RRT、RRT\*、Informed RRT\*、RRT-Connect
 - [ ] 控制器适配层：DWA、APF、RPP、LQR、MPC
 - [ ] 实车 bring-up 与标定记录
 
 ## 致谢
 
-仿真、基线与原始中文文档由 [zfyyyyy](https://github.com/zfyyyyy) 完成。本项目建立在 ROS 2、Nav2、SLAM Toolbox、Gazebo 与 OpenCV 之上。
+仿真、基线和原始中文文档由 [zfyyyyy](https://github.com/zfyyyyy) 编写。本项目使用 ROS 2、Nav2、SLAM Toolbox、Gazebo 和 OpenCV。
 
-若在研究中引用，请引用 Nav2（[Marathon 2, IROS 2020](https://arxiv.org/abs/2003.00368)）、SLAM Toolbox（[JOSS 6(61):2783, 2021](https://joss.theoj.org/papers/10.21105/joss.02783)）与 Theta\*（[JAIR 39:533–579, 2010](https://www.jair.org/index.php/jair/article/view/10676)）。
+若在研究中引用，请引用 Nav2（[Marathon 2, IROS 2020](https://arxiv.org/abs/2003.00368)）、SLAM Toolbox（[JOSS 6(61):2783, 2021](https://joss.theoj.org/papers/10.21105/joss.02783)）和 Theta\*（[JAIR 39:533–579, 2010](https://www.jair.org/index.php/jair/article/view/10676)）。
 
 ## 许可证
 
