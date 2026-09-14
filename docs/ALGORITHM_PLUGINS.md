@@ -193,10 +193,38 @@ export LD_LIBRARY_PATH=$PWD/install/algo_core/lib:$LD_LIBRARY_PATH
   src/race_navigation/maps/race_map.pgm /tmp/plan.bin \
   -3.0 -5.0 10.0 7.0 -3.700 -6.342 0.050 0.196 0.65
 
-# 渲染为 GIF
+# 渲染 2D 并排对比（六种算法）
 python3 tools/render_planning_demo.py /tmp/plan.bin \
-  src/race_navigation/maps/race_map.pgm docs/media/planning_algorithms.gif
+  src/race_navigation/maps/race_map.pgm docs/media/search_2d.gif
+
+# 回放单个算法的展开顺序到 RViz
+python3 tools/replay_search.py --dump /tmp/plan.bin --algorithm dijkstra
+python3 tools/assemble_rviz_gif.py /tmp/rvframes docs/media/rviz/dijkstra.gif
 ```
+
+> 注意：`docs/media/search_2d.gif` 必须由**与第 7 节同一份** `plan.bin` 渲染。
+> 如果这份 dump 来自其它起点/终点或其它代价模型，图上的路径与第 7 节的展开格数就对不上。
+
+## 9.1 完整任务录像
+
+上一节的动画展示的是规划器本身。展示**完整赛题链路**（AMCL → Nav2 搜索 → 绿色标志识别 → 终点靠近 → 静止 3 秒）的录像由 `competition.launch.py` 产生：
+
+```bash
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
+ros2 launch race_navigation competition.launch.py headless:=true stress:=false render_engine:=ogre
+
+# 俯视相机（注意：图像相对世界坐标轴旋转约 -7.4°，见 tools/calibrate_camera.py）
+ros2 run ros_gz_sim create -file /tmp/cam.sdf -name topcam -x 3.65 -y 1.0 -z 10.5 -P 1.5708
+ros2 run ros_gz_bridge parameter_bridge "/top_view@sensor_msgs/msg/Image[gz.msgs.Image"
+
+# 一键启动：必须用 transient-local，否则 map_search_autonomy 收不到
+ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"
+ros2 topic echo /race/state          # WAITING -> ... -> COMPLETE
+```
+
+产物在 `reports/` 下（JSON + 可读摘要），录像在 `docs/media/autonomy/`。
+
+**踩过的坑：** `ros2 topic pub` 默认是 volatile，而 `/race/start` 的订阅端是 transient-local，两者 QoS 不兼容，信号发不出去——必须先等订阅者匹配上再发。
 
 ## 10. 仿真录制的环境要求
 

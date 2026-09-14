@@ -24,3 +24,6 @@ __pycache__/
 
 # Generated at launch time by algo_bringup
 /tmp/algo_bringup_bt/
+
+# Gazebo camera sensor default dump directory (top_camera::link::top_view_*.png)
+__default__/

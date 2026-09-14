@@ -68,17 +68,41 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 
 ## 演示
 
-### Gazebo 中实车行驶
+### 完整赛题一次跑通
 
-A\* 规划了一条横穿比赛场地的路线，车按这条路线行驶，由场地上方的相机拍摄。运动是仿真产生的：Gazebo 物理、`omni_drive_controller`、与比赛相同的 `/cmd_vel` 链路。
+这是一次从**单个启动信号**开始的完整比赛运行，由场地上方的相机拍摄。全程没有手工发送任何目标点：AMCL 在已有地图上定位，Nav2 用 Theta\* 规划、MPPI Omni 跟随搜索视点，识别到墙面绿色 A4 标志后驶入黄色终点区域并静止 3 秒。
+
+- **红线** —— Nav2 当前跟随的全局路径
+- **绿线** —— 车实际走过的轨迹
+- **红点** —— 车的位置，来自 `/omni_drive_controller/odom`
+
+| | |
+| :---: | :---: |
+| **搜索中** —— 在搜索视点之间导航 | **终点靠近** —— 视觉接管阶段 |
+| ![搜索绿色标志](docs/media/autonomy/still_searching.png) | ![驶入黄色终点区域](docs/media/autonomy/still_approach.png) |
 
 <p align="center">
-  <img src="docs/media/gazebo_drive.gif" width="560" alt="俯视镜头下车辆沿 A* 路线横穿比赛场地"/>
+  <img src="docs/media/autonomy/autonomy_run.gif" width="560" alt="完整自主比赛运行：搜索、绿色标志识别、终点靠近与静止 3 秒"/>
 </p>
 
 <p align="center">
-  <sub><a href="docs/media/gazebo_drive.mp4">下载（MP4）</a></sub>
+  <sub><a href="docs/media/autonomy/autonomy_run.mp4">下载原始视频（MP4）</a></sub>
 </p>
+
+该次运行由状态机自身写入 `reports/`：
+
+| 结果 | 用时 | 路径长度 | 碰撞 |
+| :---: | ---: | ---: | ---: |
+| `COMPLETE` | 101.295 s | 27.059 m | 0 |
+
+复现命令：
+
+```bash
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
+ros2 launch race_navigation competition.launch.py headless:=true stress:=false
+ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"   # 唯一启动信号
+ros2 topic echo /race/state                                              # 观察状态机跑完
+```
 
 ### 规划器搜索过程（回放）
 

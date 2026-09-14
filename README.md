@@ -68,17 +68,40 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ## Demos
 
-### Driving in Gazebo
+### The task, run end to end
+This is one complete competition run from a single start signal, seen from a camera above the arena. Nothing is sent by hand: AMCL localises on the saved map, Nav2 plans and follows the search viewpoints with Theta\* and MPPI Omni, the green A4 marker is detected, the car drives onto the yellow pad and holds still for three seconds.
 
-A\* planned a route across the competition arena and the car follows it, seen from a camera above the arena. The motion is the simulator's: Gazebo physics, the `omni_drive_controller`, the same `/cmd_vel` chain the race uses.
+- **red** — the global path Nav2 is currently following
+- **green** — where the car has actually been
+- **red dot** — the car's position, from `/omni_drive_controller/odom`
+
+| | |
+| :---: | :---: |
+| **Searching** — navigating between viewpoints | **Approaching** — visual finish in progress |
+| ![Searching for the marker](docs/media/autonomy/still_searching.png) | ![Approaching the finish pad](docs/media/autonomy/still_approach.png) |
 
 <p align="center">
-  <img src="docs/media/gazebo_drive.gif" width="560" alt="The car driving the A* route across the competition arena, seen from a top-down camera"/>
+  <img src="docs/media/autonomy/autonomy_run.gif" width="560" alt="A complete autonomous competition run: search, green-marker detection, finish-pad approach and 3-second hold"/>
 </p>
 
 <p align="center">
-  <sub><a href="docs/media/gazebo_drive.mp4">Download (MP4)</a></sub>
+  <sub><a href="docs/media/autonomy/autonomy_run.mp4">Download the original (MP4)</a></sub>
 </p>
+
+The run below is the same stack, with the state machine's own report to `reports/`:
+
+| Outcome | Time | First detection | Path | Collisions |
+| :---: | ---: | ---: | ---: | ---: |
+| `COMPLETE` | 101.295 s | — | 27.059 m | 0 |
+
+Reproduce it:
+
+```bash
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
+ros2 launch race_navigation competition.launch.py headless:=true stress:=false
+ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"   # one start signal
+ros2 topic echo /race/state                                              # watch it finish
+```
 
 ### Planner search (replay)
 
@@ -154,6 +177,12 @@ One baseline run in the nominal world, kept as a regression reference:
 | `COMPLETE` | 90.917 s | 63.033 s | 31.303 m | 0 | 0.3658 m |
 
 This is a single run on the machine of the time, not a benchmark result. Each run is written to `reports/` as a JSON file and a readable summary.
+
+The recorded demo above is a separate run of the same stack (`COMPLETE`, 101.295 s, 27.059 m, 0 collisions); its own report is in `reports/`.
+
+## Earlier demo: A\* path following
+
+`docs/media/gazebo_drive.gif` predates the full-stack demo. It used `tools/drive_path.py`, a kinematics-level follower that reads a path from `algo_plan_dump` and publishes `/cmd_vel` directly: Gazebo physics and the `omni_drive_controller` are real, but Nav2, AMCL and the vision finish are not in the loop. It is kept because it isolates the planners' output, not because it demonstrates the task.
 
 ## Layout
 
