@@ -111,20 +111,24 @@ Every registered planner, same task, same everything else:
 
 | Global planner | Outcome | Driven | Clip |
 | :--- | :---: | ---: | :---: |
-| **Weighted A\*** | `COMPLETE` | 29.7 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
-| **A\*** | `COMPLETE` | 36.5 m | ![astar](docs/media/run_sidebyside/astar.gif) |
-| **Dijkstra** | `COMPLETE` | 40.8 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
-| **GBFS** | `COMPLETE` | 40.5 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
-| **D\* Lite** | `COMPLETE` | 58.7 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
-| **Theta\*** | `COMPLETE` | 149.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
-| **JPS** | `COMPLETE` | 102.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+| **Weighted A\*** | `COMPLETE` | 55.2 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
+| **A\*** | `COMPLETE` | 36.6 m | ![astar](docs/media/run_sidebyside/astar.gif) |
+| **Dijkstra** | `COMPLETE` | 33.1 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
+| **D\* Lite** | `COMPLETE` | 35.4 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
+| **Theta\*** | `COMPLETE` | 76.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
+| **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
+| **JPS** | did not finish | 214.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-All seven complete the task, which is the honest result and also a warning about
-reading too much into a single number. The distance driven is not the planner's
-path quality: it counts every replan and every viewpoint revisit the mission
-asked for, and Theta\*'s 149 m is that, not a bad path. These clips are for
-seeing the behaviour, not for ranking the algorithms — the offline table above,
-measured on one planning call, is the ranking.
+Six of the seven finish the task; JPS does not, and that is consistent with
+everything else known about it — its pruning is wrong on this map, so it
+repeatedly fails to produce a path, and the mission spends its whole search
+budget being sent to viewpoints it never reaches. Its clip is included because
+seeing it wander is the point; it is not a result to report.
+
+The distance driven is not a ranking either. It counts every replan and every
+viewpoint revisit the mission asked for, so GBFS's 178.9 m reflects how much it
+was sent back and forth, not a bad path. The offline table above, measured on a
+single planning call, is the ranking; these clips are for seeing behaviour.
 
 The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`. To reproduce
 one run directly:

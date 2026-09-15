@@ -1,0 +1,58 @@
+{
+  "run_id": "20260916_035734_001",
+  "status": "COMPLETE",
+  "timestamp": "2026-09-16T03:57:34.455900+08:00",
+  "timing": {
+    "start_sim_ns": 57623000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 151268000000,
+    "official_navigation_seconds": 93.64500000000001,
+    "verified_completion_seconds": 93.64500000000001,
+    "official_wall_seconds": 142.506602961,
+    "verified_wall_seconds": 142.506602961,
+    "simulation_realtime_factor_observed": 0.6571274457059929,
+    "first_green_board_seconds": 80.816
+  },
+  "motion": {
+    "path_length_m": 33.16848785091205,
+    "command_speed_max_mps": 0.6297469220979276,
+    "measured_speed_max_mps": 0.7151951316917159,
+    "speed_tracking_mae_mps": 0.018370300578776737,
+    "speed_tracking_rmse_mps": 0.035286211969260045,
+    "speed_tracking_max_error_mps": 0.25394838036967415,
+    "mean_relative_slip": 0.04187204418478805,
+    "max_relative_slip": 0.5422347831635073,
+    "tracking_samples": 1818
+  },
+  "safety": {
+    "collision_events": 0,
+    "collision_pairs": {},
+    "maximum_contact_depth_m": 0.0,
+    "minimum_lidar_clearance_m": 0.2900834381580353
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.00033862958662211895,
+    "final_board_area_ratio": 0.7010449171066284,
+    "final_front_range_m": 0.36977237462997437,
+    "final_wall_range_error_m": 0.02977237462997434
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 4,
+      "SCANNING_360_FOR_GREEN_BOARD": 4,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 3,
+      "ALIGNING_WITH_GREEN_BOARD": 1,
+      "APPROACHING_YELLOW_FINISH_PAD": 1,
+      "HOLDING_STILL_FOR_3_SECONDS": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.002,
+      "PREPARING_MAP_SEARCH": 0.308,
+      "SCANNING_360_FOR_GREEN_BOARD": 13.879000000000001,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 66.62700000000001,
+      "ALIGNING_WITH_GREEN_BOARD": 0.761,
+      "APPROACHING_YELLOW_FINISH_PAD": 9.068000000000001,
+      "HOLDING_STILL_FOR_3_SECONDS": 3.0
+    }
+  }
+}

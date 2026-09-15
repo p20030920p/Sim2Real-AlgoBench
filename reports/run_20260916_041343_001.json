@@ -1,0 +1,60 @@
+{
+  "run_id": "20260916_041343_001",
+  "status": "COMPLETE",
+  "timestamp": "2026-09-16T04:13:43.093099+08:00",
+  "timing": {
+    "start_sim_ns": 57666000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 150335000000,
+    "official_navigation_seconds": 92.66900000000001,
+    "verified_completion_seconds": 92.66900000000001,
+    "official_wall_seconds": 139.468065137,
+    "verified_wall_seconds": 139.468065137,
+    "simulation_realtime_factor_observed": 0.6644460142827027,
+    "first_green_board_seconds": 64.462
+  },
+  "motion": {
+    "path_length_m": 35.42550682039095,
+    "command_speed_max_mps": 0.6149946907767925,
+    "measured_speed_max_mps": 1.1120890520860638,
+    "speed_tracking_mae_mps": 0.017582740751832835,
+    "speed_tracking_rmse_mps": 0.037500739195938985,
+    "speed_tracking_max_error_mps": 0.6087130387267287,
+    "mean_relative_slip": 0.0409037412204427,
+    "max_relative_slip": 7.219934344214166,
+    "tracking_samples": 1789
+  },
+  "safety": {
+    "collision_events": 1,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::right_wheel_link::right_wheel_link_collision": 1
+    },
+    "maximum_contact_depth_m": 2.723396335196915e-06,
+    "minimum_lidar_clearance_m": 0.20540152490139008
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": -0.013572929427027702,
+    "final_board_area_ratio": 0.697791337966919,
+    "final_front_range_m": 0.36989423632621765,
+    "final_wall_range_error_m": 0.029894236326217627
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 4,
+      "SCANNING_360_FOR_GREEN_BOARD": 3,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 3,
+      "ALIGNING_WITH_GREEN_BOARD": 1,
+      "APPROACHING_YELLOW_FINISH_PAD": 1,
+      "HOLDING_STILL_FOR_3_SECONDS": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.678,
+      "PREPARING_MAP_SEARCH": 0.272,
+      "SCANNING_360_FOR_GREEN_BOARD": 12.055000000000001,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 51.458000000000006,
+      "ALIGNING_WITH_GREEN_BOARD": 1.0070000000000001,
+      "APPROACHING_YELLOW_FINISH_PAD": 24.134,
+      "HOLDING_STILL_FOR_3_SECONDS": 3.0650000000000004
+    }
+  }
+}

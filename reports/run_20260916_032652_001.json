@@ -1,0 +1,58 @@
+{
+  "run_id": "20260916_032652_001",
+  "status": "TIMEOUT",
+  "timestamp": "2026-09-16T03:26:52.621522+08:00",
+  "timing": {
+    "start_sim_ns": 57948000000,
+    "finish_entry_sim_ns": null,
+    "complete_sim_ns": 358000000000,
+    "official_navigation_seconds": 300.052,
+    "verified_completion_seconds": 300.052,
+    "official_wall_seconds": 461.91598824700003,
+    "verified_wall_seconds": 461.91598824700003,
+    "simulation_realtime_factor_observed": 0.6495813256837376,
+    "first_green_board_seconds": 63.120000000000005
+  },
+  "motion": {
+    "path_length_m": 42.27399010213241,
+    "command_speed_max_mps": 0.6121830479572004,
+    "measured_speed_max_mps": 0.8240444586599215,
+    "speed_tracking_mae_mps": 0.0076710519755712825,
+    "speed_tracking_rmse_mps": 0.020761586832907974,
+    "speed_tracking_max_error_mps": 0.3296177834628901,
+    "mean_relative_slip": 0.04747879991507485,
+    "max_relative_slip": 0.9999999982868458,
+    "tracking_samples": 5754
+  },
+  "safety": {
+    "collision_events": 1,
+    "collision_pairs": {
+      "competition_map_dae::map_link::map_collision <> omni_car::front_wheel_link::front_wheel_link_collision": 4079
+    },
+    "maximum_contact_depth_m": 4.826214467551493e-05,
+    "minimum_lidar_clearance_m": 0.19042813777923584
+  },
+  "finish_accuracy": {
+    "final_board_horizontal_error_normalized": 0.0013549900613725185,
+    "final_board_area_ratio": 0.0041178385727107525,
+    "final_front_range_m": 0.19421511888504028,
+    "final_wall_range_error_m": -0.14578488111495974
+  },
+  "states": {
+    "entry_counts": {
+      "PREPARING_MAP_SEARCH": 4,
+      "SCANNING_360_FOR_GREEN_BOARD": 3,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 3,
+      "ALIGNING_WITH_GREEN_BOARD": 1,
+      "APPROACHING_YELLOW_FINISH_PAD": 1
+    },
+    "duration_seconds": {
+      "WAITING_FOR_STATE": 0.9630000000000001,
+      "PREPARING_MAP_SEARCH": 0.27,
+      "SCANNING_360_FOR_GREEN_BOARD": 12.032,
+      "NAVIGATING_TO_SEARCH_VIEWPOINT": 49.858000000000004,
+      "ALIGNING_WITH_GREEN_BOARD": 0.9970000000000001,
+      "APPROACHING_YELLOW_FINISH_PAD": 235.93200000000002
+    }
+  }
+}

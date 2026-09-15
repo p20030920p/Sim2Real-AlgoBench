@@ -96,15 +96,17 @@ tools/record_all_planners.sh /tmp/planners        # 录制全部已注册规划�
 
 | 全局规划器 | 结果 | 实际行驶 | 录像 |
 | :--- | :---: | ---: | :---: |
-| **Weighted A\*** | `COMPLETE` | 29.7 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
-| **A\*** | `COMPLETE` | 36.5 m | ![astar](docs/media/run_sidebyside/astar.gif) |
-| **Dijkstra** | `COMPLETE` | 40.8 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
-| **GBFS** | `COMPLETE` | 40.5 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
-| **D\* Lite** | `COMPLETE` | 58.7 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
-| **Theta\*** | `COMPLETE` | 149.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
-| **JPS** | `COMPLETE` | 102.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+| **Weighted A\*** | `COMPLETE` | 55.2 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
+| **A\*** | `COMPLETE` | 36.6 m | ![astar](docs/media/run_sidebyside/astar.gif) |
+| **Dijkstra** | `COMPLETE` | 33.1 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
+| **D\* Lite** | `COMPLETE` | 35.4 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
+| **Theta\*** | `COMPLETE` | 76.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
+| **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
+| **JPS** | 未跑完 | 214.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-七个都跑完了任务，这是如实的结果，同时也是"不要过度解读单一数字"的提醒：行驶距离**不是**路径质量，它包含任务要求的每一次重规划与视点重访，Theta\* 的 149 m 是这个原因，不是路径差。这些录像用来看行为，不用来给算法排名——排名是上面那张单次规划调用的离线表。
+七个里有六个跑完了任务，JPS 没有——这与已知情况一致：它在这张图上剪枝有误，反复无法生成路径，于是任务把整个搜索预算都花在派它去永远到不了的视点上。它的录像保留下来，是因为"看它乱走"本身有意义，不是可用结果。
+
+行驶距离同样不是排名：它包含任务要求的每一次重规划与视点重访，所以 GBFS 的 178.9 m 反映的是它被来回派的次数，不是路径差。排名是上面那张单次规划调用的离线表；这些录像用来看行为。
 
 MP4 在 `docs/media/run_sidebyside/<algorithm>.mp4`。直接复现一次运行：
 
