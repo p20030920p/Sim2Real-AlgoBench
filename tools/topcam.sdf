@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="topcam">
+    <static>true</static>
+    <pose>3.65 1.0 10.5 0 1.5708 0</pose>
+    <link name="link">
+      <sensor name="view" type="camera">
+        <topic>/top_view</topic>
+        <update_rate>10</update_rate>
+        <camera>
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image><width>480</width><height>480</height><format>R8G8B8</format></image>
+          <clip><near>0.05</near><far>60.0</far></clip>
+        </camera>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+  </model>
+</sdf>

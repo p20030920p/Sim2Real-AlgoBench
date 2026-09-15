@@ -1,0 +1,11 @@
+{
+  "algorithm": "astar",
+  "outcome": "COMPLETE",
+  "frames": 1029,
+  "plan_poses": 39,
+  "travelled_m": 27.78,
+  "clip": "docs/media/run_sidebyside/astar.mp4",
+  "left": "Gazebo top-down camera",
+  "right": "RViz: map, global costmap, scan, /plan, robot",
+  "host": "VMware + Mesa software rendering"
+}

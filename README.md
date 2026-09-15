@@ -103,20 +103,41 @@ ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"   # one 
 ros2 topic echo /race/state                                              # watch it finish
 ```
 
-### Planner search (replay)
+### The task, with the planner's plan beside it
 
-These six are not the simulator running. Each is a playback of the order in which the planner expanded cells, recorded once and replayed at a speed the eye can follow, because a planner returns in a few milliseconds. What they show honestly is the shape of each search; what they do not show is real-time execution.
+Gazebo on the left, RViz on the right, one complete run from the start signal to
+the 3-second hold. The left half is the simulator's own top-down camera; the
+right half is RViz drawing the same moment from the same topics — the saved map,
+the global costmap, the live LiDAR scan, the planned path in red, and the robot
+model. Nothing is composited or re-timed: both halves are captured from one run,
+and the state in the header comes from `/race/state`.
 
-| | |
-| :---: | :---: |
-| **Dijkstra** — floods the whole map | **A\*** — the heuristic cuts it down |
-| ![Dijkstra search](docs/media/rviz/dijkstra.gif) | ![A* search](docs/media/rviz/astar.gif) |
-| **Weighted A\*** — greedier, fewer cells | **GBFS** — narrowest frontier of the six |
-| ![Weighted A* search](docs/media/rviz/weighted_astar.gif) | ![GBFS search](docs/media/rviz/gbfs.gif) |
-| **Theta\*** — any-angle, no staircase | **D\* Lite** — almost nothing to expand |
-| ![Theta* search](docs/media/rviz/theta_star.gif) | ![D* Lite search](docs/media/rviz/d_star_lite.gif) |
+<p align="center">
+  <img src="docs/media/run_sidebyside/astar.gif" width="820" alt="One autonomous run: Gazebo on the left, the navigation stack in RViz on the right, same moment"/>
+</p>
 
-The same six searches side by side, colouring the expansion order:
+<p align="center">
+  <sub><a href="docs/media/run_sidebyside/astar.mp4">Download the full run (MP4, 4 fps, A* as the global planner)</a></sub>
+</p>
+
+The point of showing both is that neither half is sufficient alone. Gazebo shows
+what the robot did; RViz shows what the navigation stack believed, and the path
+it committed to. When they disagree, that is the interesting case.
+
+### Search shape, and how to read the colours
+
+`docs/media/search_2d.gif` animates the order in which each planner expanded
+cells, from `algo_plan_dump`'s record of the real searches. The colour is
+**expansion order, normalised per panel**: the first cell a planner expanded is
+pale yellow, the last is saturated orange.
+
+Normalised per panel is what makes this figure easy to misread, so it is worth
+being explicit: orange in the Dijkstra panel is roughly expansion 55,000, and
+orange in the D\* Lite panel is roughly expansion 375. Two panels of the same
+colour are at the same *fraction* of their own search, not at the same amount of
+work. To compare how much work each planner did, read the cell count printed
+under each panel, not the colour — A\* expands 26,442 cells against D\* Lite's
+375, which is the entire reason the incremental planner exists.
 
 ![Six planner searches side by side](docs/media/search_2d.gif)
 
@@ -126,10 +147,10 @@ The same six searches side by side, colouring the expansion order:
 
 ### The same task, one algorithm at a time
 
-The replays above show what each planner expands; they do not show what each
-planner makes the robot *do*. These are separate recordings of the complete
-autonomous run from above — same map, same start pose, same costmap, same
-controller, same behaviour tree — with only the global planner swapped:
+The figure above shows what each planner expands; it does not show what each
+planner makes the robot *do*. These are separate recordings of the same task —
+same map, same start pose, same costmap, same controller, same behaviour tree —
+with only the global planner swapped:
 
 ```bash
 tools/run_algorithm_comparison.sh /tmp/race_algo_runs astar dijkstra theta_star
