@@ -197,9 +197,6 @@ export LD_LIBRARY_PATH=$PWD/install/algo_core/lib:$LD_LIBRARY_PATH
 python3 tools/render_planning_demo.py /tmp/plan.bin \
   src/race_navigation/maps/race_map.pgm docs/media/search_2d.gif
 
-# 回放单个算法的展开顺序到 RViz
-python3 tools/replay_search.py --dump /tmp/plan.bin --algorithm dijkstra
-python3 tools/assemble_rviz_gif.py /tmp/rvframes docs/media/rviz/dijkstra.gif
 ```
 
 > 注意：`docs/media/search_2d.gif` 必须由**与第 7 节同一份** `plan.bin` 渲染。
@@ -213,8 +210,9 @@ python3 tools/assemble_rviz_gif.py /tmp/rvframes docs/media/rviz/dijkstra.gif
 export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
 ros2 launch race_navigation competition.launch.py headless:=true stress:=false render_engine:=ogre
 
-# 俯视相机（注意：图像相对世界坐标轴旋转约 -7.4°，见 tools/calibrate_camera.py）
-ros2 run ros_gz_sim create -file /tmp/cam.sdf -name topcam -x 3.65 -y 1.0 -z 10.5 -P 1.5708
+# 俯视相机。注意：它的图像相对世界坐标系旋转 180°，录制时要转回来，
+# 否则 Gazebo 与 RViz 两半的场地朝向相反。角度是实测的，见 README。
+ros2 run ros_gz_sim create -file tools/topcam.sdf -name topcam -x 3.65 -y 1.0 -z 10.5 -P 1.5708
 ros2 run ros_gz_bridge parameter_bridge "/top_view@sensor_msgs/msg/Image[gz.msgs.Image"
 
 # 一键启动：必须用 transient-local，否则 map_search_autonomy 收不到
@@ -222,7 +220,11 @@ ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"
 ros2 topic echo /race/state          # WAITING -> ... -> COMPLETE
 ```
 
-产物在 `reports/` 下（JSON + 可读摘要），录像在 `docs/media/autonomy/`。
+产物在 `reports/` 下（JSON + 可读摘要），录像在 `docs/media/run_sidebyside/`。
+
+**注意俯视相机的朝向。** 它的图像相对地图与 RViz 使用的世界坐标系旋转了 180°。
+录制程序（`tools/record_run_sidebyside.py`）会把相机那一半转回来，否则左右两半
+的场地朝向相反，对比就没有意义。这个角度是实测的，见 README 里的标记物数据。
 
 **踩过的坑：** `ros2 topic pub` 默认是 volatile，而 `/race/start` 的订阅端是 transient-local，两者 QoS 不兼容，信号发不出去——必须先等订阅者匹配上再发。
 

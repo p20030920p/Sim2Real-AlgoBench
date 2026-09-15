@@ -68,56 +68,54 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 
 ## 演示
 
-### 完整赛题一次跑通
+### 完整赛题一次跑通：左边 Gazebo，右边 RViz
 
-这是一次从**单个启动信号**开始的完整比赛运行，由场地上方的相机拍摄。全程没有手工发送任何目标点：AMCL 在已有地图上定位，Nav2 用 Theta\* 规划、MPPI Omni 跟随搜索视点，识别到墙面绿色 A4 标志后驶入黄色终点区域并静止 3 秒。
+从**单个启动信号**开始的一次完整运行，到静止 3 秒结束。左半是仿真器自己的俯视相机，**不带任何叠加**；右半是 RViz 画的同一时刻——已有地图、全局代价地图、实时激光、红色规划路径和机器人模型。两半来自同一次运行，没有拼接也没有重新计时，顶部状态来自 `/race/state`。
 
-- **红线** —— Nav2 当前跟随的全局路径
-- **绿线** —— 车实际走过的轨迹
-- **红点** —— 车的位置，来自 `/omni_drive_controller/odom`
+两半必须转到同一角度，否则这个对比没有意义。俯视相机的图像相对地图与 RViz 使用的世界坐标系**旋转了 180°**，这是实测的：把标记物放在已知世界坐标上，在相机图像里定位它们，相机位于场地中心而图像中心是 (240, 240)：
 
-| | |
-| :---: | :---: |
-| **搜索中** —— 在搜索视点之间导航 | **终点靠近** —— 视觉接管阶段 |
-| ![搜索绿色标志](docs/media/autonomy/still_searching.png) | ![驶入黄色终点区域](docs/media/autonomy/still_approach.png) |
+| 标记物世界坐标 | 相机像素 |
+| :--- | :--- |
+| (3.65, 3.00) —— 相机自身位置沿 +y 两米 | (240, 180) |
+| (5.65, 1.00) —— 沿 +x 两米 | (62, 113) |
+| (8.07, 7.53) —— 起点位姿 | (118, 245) |
 
-<p align="center">
-  <img src="docs/media/autonomy/autonomy_run.gif" width="560" alt="完整自主比赛运行：搜索、绿色标志识别、终点靠近与静止 3 秒"/>
-</p>
+即 `px = 240 − 27.1·(wy − 1.0)`、`py = 240 − 27.1·(wx − 3.65)`：两个世界轴在图像里都反了，也就是半圈。把相机那一半旋转 180° 后即可复现北向地图——未知区域在左上、内部墙体一致、角落几何一致。录制程序只做这一件事。
 
-<p align="center">
-  <sub><a href="docs/media/autonomy/autonomy_run.mp4">下载原始视频（MP4）</a></sub>
-</p>
+```bash
+tools/record_all_planners.sh /tmp/planners        # 录制全部已注册规划器
+```
 
-该次运行由状态机自身写入 `reports/`：
+同时展示两半的意义在于：任何一半都不够。Gazebo 说明机器人做了什么，RViz 说明导航栈相信什么、决定了走哪条路。两者不一致的时候，才是有意思的情况。
 
-| 结果 | 用时 | 路径长度 | 碰撞 |
-| :---: | ---: | ---: | ---: |
-| `COMPLETE` | 101.295 s | 27.059 m | 0 |
+同一赛题，逐个规划器，其余完全相同：
 
-复现命令：
+| 全局规划器 | 结果 | 实际行驶 | 录像 |
+| :--- | :---: | ---: | :---: |
+| **Weighted A\*** | `COMPLETE` | 29.7 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
+| **A\*** | `COMPLETE` | 36.5 m | ![astar](docs/media/run_sidebyside/astar.gif) |
+| **Dijkstra** | `COMPLETE` | 40.8 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
+| **GBFS** | `COMPLETE` | 40.5 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
+| **D\* Lite** | `COMPLETE` | 58.7 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
+| **Theta\*** | `COMPLETE` | 149.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
+| **JPS** | `COMPLETE` | 102.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+
+七个都跑完了任务，这是如实的结果，同时也是"不要过度解读单一数字"的提醒：行驶距离**不是**路径质量，它包含任务要求的每一次重规划与视点重访，Theta\* 的 149 m 是这个原因，不是路径差。这些录像用来看行为，不用来给算法排名——排名是上面那张单次规划调用的离线表。
+
+MP4 在 `docs/media/run_sidebyside/<algorithm>.mp4`。直接复现一次运行：
 
 ```bash
 export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
 ros2 launch race_navigation competition.launch.py headless:=true stress:=false
-ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"   # 唯一启动信号
-ros2 topic echo /race/state                                              # 观察状态机跑完
+python3 tools/send_start_signal.py        # 唯一启动信号
+ros2 topic echo /race/state               # 观察状态机跑完
 ```
 
-### 规划器搜索过程（回放）
+### 搜索形状，以及颜色怎么读
 
-下面六段**不是仿真在运行**。它们是把规划器展开格子的顺序录制下来、以肉眼能跟上的速度回放，因为规划器本身只要几毫秒就返回了。它们如实展示的是每次搜索的形状，没有展示的是实时执行。
+`docs/media/search_2d.gif` 把每个规划器展开格子的顺序做成动画，数据来自 `algo_plan_dump` 对真实搜索的记录。颜色表示**展开顺序，且按面板各自归一化**：该规划器展开的第一个格子是淡黄，最后一个是饱和橙。
 
-| | |
-| :---: | :---: |
-| **Dijkstra** —— 铺满整张地图 | **A\*** —— 启发式大幅收窄 |
-| ![Dijkstra 搜索](docs/media/rviz/dijkstra.gif) | ![A* 搜索](docs/media/rviz/astar.gif) |
-| **Weighted A\*** —— 更贪心，格子更少 | **GBFS** —— 六者中前沿最窄 |
-| ![Weighted A* 搜索](docs/media/rviz/weighted_astar.gif) | ![GBFS 搜索](docs/media/rviz/gbfs.gif) |
-| **Theta\*** —— 任意角，无栅格阶梯 | **D\* Lite** —— 几乎没有展开 |
-| ![Theta* 搜索](docs/media/rviz/theta_star.gif) | ![D* Lite 搜索](docs/media/rviz/d_star_lite.gif) |
-
-同样六次搜索并排对比，按展开顺序着色：
+"按面板各自归一化"正是这张图容易被误读的地方，所以说清楚：Dijkstra 面板里的橙色大约是第 55,000 个格子，而 D\* Lite 面板里的橙色大约是第 375 个。两个面板出现同一种颜色，表示它们各自搜索到了同样的**百分比**，而不是同样的工作量。要比较各规划器做了多少工作，请看每个面板下方印的格数，不要看颜色——A\* 展开 26,442 格，而 D\* Lite 展开 375 格，这正是增量式规划器存在的全部理由。
 
 ![六种规划器搜索并排对比](docs/media/search_2d.gif)
 

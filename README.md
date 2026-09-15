@@ -68,41 +68,6 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 
 ## Demos
 
-### The task, run end to end
-This is one complete competition run from a single start signal, seen from a camera above the arena. Nothing is sent by hand: AMCL localises on the saved map, Nav2 plans and follows the search viewpoints with Theta\* and MPPI Omni, the green A4 marker is detected, the car drives onto the yellow pad and holds still for three seconds.
-
-- **red** — the global path Nav2 is currently following
-- **green** — where the car has actually been
-- **red dot** — the car's position, from `/omni_drive_controller/odom`
-
-| | |
-| :---: | :---: |
-| **Searching** — navigating between viewpoints | **Approaching** — visual finish in progress |
-| ![Searching for the marker](docs/media/autonomy/still_searching.png) | ![Approaching the finish pad](docs/media/autonomy/still_approach.png) |
-
-<p align="center">
-  <img src="docs/media/autonomy/autonomy_run.gif" width="560" alt="A complete autonomous competition run: search, green-marker detection, finish-pad approach and 3-second hold"/>
-</p>
-
-<p align="center">
-  <sub><a href="docs/media/autonomy/autonomy_run.mp4">Download the original (MP4)</a></sub>
-</p>
-
-The run below is the same stack, with the state machine's own report to `reports/`:
-
-| Outcome | Time | First detection | Path | Collisions |
-| :---: | ---: | ---: | ---: | ---: |
-| `COMPLETE` | 101.295 s | — | 27.059 m | 0 |
-
-Reproduce it:
-
-```bash
-export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
-ros2 launch race_navigation competition.launch.py headless:=true stress:=false
-ros2 topic pub --once -w 1 /race/start std_msgs/msg/Bool "{data: true}"   # one start signal
-ros2 topic echo /race/state                                              # watch it finish
-```
-
 ### The task, with the planner's plan beside it
 
 Gazebo on the left, RViz on the right, one complete run from the start signal to
@@ -159,7 +124,15 @@ asked for, and Theta\*'s 149 m is that, not a bad path. These clips are for
 seeing the behaviour, not for ranking the algorithms — the offline table above,
 measured on one planning call, is the ranking.
 
-The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`.
+The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`. To reproduce
+one run directly:
+
+```bash
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
+ros2 launch race_navigation competition.launch.py headless:=true stress:=false
+python3 tools/send_start_signal.py        # the one start signal
+ros2 topic echo /race/state               # watch it finish
+```
 
 ### Search shape, and how to read the colours
 
@@ -181,40 +154,6 @@ under each panel, not the colour — A\* expands 26,442 cells against D\* Lite's
 <p align="center">
   <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code></sub>
 </p>
-
-### The same task, one algorithm at a time
-
-The figure above shows what each planner expands; it does not show what each
-planner makes the robot *do*. These are separate recordings of the same task —
-same map, same start pose, same costmap, same controller, same behaviour tree —
-with only the global planner swapped:
-
-```bash
-tools/run_algorithm_comparison.sh /tmp/race_algo_runs astar dijkstra theta_star
-python3 tools/assemble_algo_runs.py --runs /tmp/race_algo_runs \
-    --out docs/media/algorithms
-```
-
-Each clip is the arena seen from above, with the planner's own path in red and
-where the car actually went in green.
-
-| | |
-| :---: | :---: |
-| **Dijkstra** — `COMPLETE`, 29.3 m driven | ![dijkstra](docs/media/algorithms/dijkstra.gif) |
-| **A*** — `COMPLETE`, 32.8 m driven | ![astar](docs/media/algorithms/astar.gif) |
-| **Weighted A*** — `COMPLETE`, 33.3 m driven | ![weighted_astar](docs/media/algorithms/weighted_astar.gif) |
-| **GBFS** — `COMPLETE`, 50.4 m driven | ![gbfs](docs/media/algorithms/gbfs.gif) |
-
-All four finish the task. GBFS drives furthest — a greedy search takes the first
-route it finds rather than a good one, and the figure shows the cost of that
-directly. The recordings are not a timing benchmark: Gazebo runs at a fraction
-of real time on a software-rendered VM, so clip length reflects the machine, not
-the planner. The distance driven is the honest comparison.
-
-(Theta\*, D\* Lite and JPS are not in the table: Theta\* stalled the simulator
-during recording, and JPS is broken on this map — see below. The harness records
-one algorithm at a time and can be pointed at any of them:
-`tools/run_algorithm_comparison.sh /tmp/runs theta_star`.)
 
 ### Stress world
 
@@ -271,10 +210,6 @@ One baseline run in the nominal world, kept as a regression reference:
 This is a single run on the machine of the time, not a benchmark result. Each run is written to `reports/` as a JSON file and a readable summary.
 
 The recorded demo above is a separate run of the same stack (`COMPLETE`, 101.295 s, 27.059 m, 0 collisions); its own report is in `reports/`.
-
-## Earlier demo: A\* path following
-
-`docs/media/gazebo_drive.gif` predates the full-stack demo. It used `tools/drive_path.py`, a kinematics-level follower that reads a path from `algo_plan_dump` and publishes `/cmd_vel` directly: Gazebo physics and the `omni_drive_controller` are real, but Nav2, AMCL and the vision finish are not in the loop. It is kept because it isolates the planners' output, not because it demonstrates the task.
 
 ## Layout
 
