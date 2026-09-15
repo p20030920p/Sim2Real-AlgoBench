@@ -11,5 +11,18 @@
     "mp4": "docs/media/run_sidebyside/weighted_astar.mp4",
     "gif_mb": 2.27,
     "mp4_mb": 2.51
+  },
+  {
+    "algorithm": "astar",
+    "outcome": null,
+    "last_state": "ALIGNING_WITH_GREEN_BOARD",
+    "frames": 3001,
+    "travelled_m": 25.6,
+    "rviz_frames_captured": 3001,
+    "rviz_frames_missing": 0,
+    "gif": "docs/media/run_sidebyside/astar.gif",
+    "mp4": "docs/media/run_sidebyside/astar.mp4",
+    "gif_mb": 2.52,
+    "mp4_mb": 9.28
   }
 ]
