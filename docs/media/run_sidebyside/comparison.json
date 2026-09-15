@@ -50,5 +50,18 @@
     "mp4": "docs/media/run_sidebyside/gbfs.mp4",
     "gif_mb": 2.47,
     "mp4_mb": 6.44
+  },
+  {
+    "algorithm": "d_star_lite",
+    "outcome": "COMPLETE",
+    "last_state": "COMPLETE",
+    "frames": 678,
+    "travelled_m": 35.4,
+    "rviz_frames_captured": 678,
+    "rviz_frames_missing": 0,
+    "gif": "docs/media/run_sidebyside/d_star_lite.gif",
+    "mp4": "docs/media/run_sidebyside/d_star_lite.mp4",
+    "gif_mb": 2.48,
+    "mp4_mb": 1.87
   }
 ]
