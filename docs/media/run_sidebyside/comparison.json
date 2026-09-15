@@ -76,5 +76,18 @@
     "mp4": "docs/media/run_sidebyside/theta_star.mp4",
     "gif_mb": 2.48,
     "mp4_mb": 3.31
+  },
+  {
+    "algorithm": "jps",
+    "outcome": null,
+    "last_state": "NAVIGATING_TO_SEARCH_VIEWPOINT",
+    "frames": 3001,
+    "travelled_m": 211.3,
+    "rviz_frames_captured": 3001,
+    "rviz_frames_missing": 0,
+    "gif": "docs/media/run_sidebyside/jps.gif",
+    "mp4": "docs/media/run_sidebyside/jps.mp4",
+    "gif_mb": 2.49,
+    "mp4_mb": 8.27
   }
 ]
