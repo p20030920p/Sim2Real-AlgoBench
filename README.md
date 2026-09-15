@@ -117,18 +117,19 @@ Every registered planner, same task, same everything else:
 | **D\* Lite** | `COMPLETE` | 35.4 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
 | **Theta\*** | `COMPLETE` | 76.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
 | **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
-| **JPS** | did not finish | 214.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+| **JPS** | `COMPLETE` | 143.9 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-Six of the seven finish the task; JPS does not, and that is consistent with
-everything else known about it — its pruning is wrong on this map, so it
-repeatedly fails to produce a path, and the mission spends its whole search
-budget being sent to viewpoints it never reaches. Its clip is included because
-seeing it wander is the point; it is not a result to report.
+All seven finish the task, JPS included - which is worth a second look, because
+the offline table above has JPS failing on the same map. The two do not plan on
+the same thing: the dump converts the saved map with map_server's trinary rule,
+while the stack plans on the inflated global costmap, and JPS's pruning survives
+one and not the other. It completed here at the greatest distance of the seven,
+and its search still should not be trusted until that discrepancy is understood.
 
-The distance driven is not a ranking either. It counts every replan and every
-viewpoint revisit the mission asked for, so GBFS's 178.9 m reflects how much it
-was sent back and forth, not a bad path. The offline table above, measured on a
-single planning call, is the ranking; these clips are for seeing behaviour.
+Distance driven is not a ranking either. It counts every replan and every
+viewpoint revisit the mission asked for, so GBFS's 178.9 m reflects how often it
+was sent back and forth rather than a bad path. The offline table above, measured
+on a single planning call, is the ranking; these clips are for seeing behaviour.
 
 The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`. To reproduce
 one run directly:
@@ -237,8 +238,16 @@ src/
 | Document | Contents |
 | :--- | :--- |
 | [`docs/ALGORITHM_PLUGINS.md`](docs/ALGORITHM_PLUGINS.md) | Adding an algorithm, the selection mechanism, simulation and hardware use |
-| [`tools/make_gif.py`](tools/make_gif.py) | Converts a screen recording into the GIFs above |
-| [`tools/render_planning_demo.py`](tools/render_planning_demo.py) | Renders the planning comparison from `algo_plan_dump` output |
+| [`tools/record_all_planners.sh`](tools/record_all_planners.sh) | Records the side-by-side clips, one run per global planner |
+| [`tools/assemble_sidebyside.py`](tools/assemble_sidebyside.py) | Builds those clips into the media, and checks each one |
+| [`tools/render_planning_demo.py`](tools/render_planning_demo.py) | Renders the search-shape figure from `algo_plan_dump` output |
+| [`tools/make_gif.py`](tools/make_gif.py) | Converts a screen recording into a GIF |
+
+`tools/assemble_sidebyside.py` is worth pointing at because it does not trust
+the recordings. It measures the mean brightness of each half, so a half that
+never got written is reported rather than published, and it checks the car
+against its spawn pose, so two halves left at different angles are caught. Both
+of those shipped as silent defects once.
 
 ### Adding an algorithm
 

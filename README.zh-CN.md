@@ -102,9 +102,9 @@ tools/record_all_planners.sh /tmp/planners        # 录制全部已注册规划�
 | **D\* Lite** | `COMPLETE` | 35.4 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
 | **Theta\*** | `COMPLETE` | 76.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
 | **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
-| **JPS** | 未跑完 | 214.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+| **JPS** | `COMPLETE` | 143.9 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-七个里有六个跑完了任务，JPS 没有——这与已知情况一致：它在这张图上剪枝有误，反复无法生成路径，于是任务把整个搜索预算都花在派它去永远到不了的视点上。它的录像保留下来，是因为"看它乱走"本身有意义，不是可用结果。
+七个全部跑完了任务，包括 JPS——这一点值得多看一眼，因为上面那张离线表里 JPS 在同一张地图上是失败的。两者规划的对象不同：dump 用 map_server 的三值规则转换已保存地图，而完整栈规划的是带膨胀的全局代价地图，JPS 的剪枝在其中之一上能通过、在另一个上不能。它这次跑完了，而且是七个里行驶距离最大的一个；在那个差异弄清楚之前，它的搜索仍然不可信。
 
 行驶距离同样不是排名：它包含任务要求的每一次重规划与视点重访，所以 GBFS 的 178.9 m 反映的是它被来回派的次数，不是路径差。排名是上面那张单次规划调用的离线表；这些录像用来看行为。
 
