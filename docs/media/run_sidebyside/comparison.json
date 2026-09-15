@@ -1,72 +1,15 @@
 [
   {
-    "algorithm": "astar",
-    "outcome": "COMPLETE",
-    "frames": 741,
-    "travelled_m": 36.48,
-    "gif": "docs/media/run_sidebyside/astar.gif",
-    "mp4": "docs/media/run_sidebyside/astar.mp4",
-    "gif_mb": 2.59,
-    "mp4_mb": 2.16
-  },
-  {
-    "algorithm": "d_star_lite",
-    "outcome": "COMPLETE",
-    "frames": 1146,
-    "travelled_m": 58.71,
-    "gif": "docs/media/run_sidebyside/d_star_lite.gif",
-    "mp4": "docs/media/run_sidebyside/d_star_lite.mp4",
-    "gif_mb": 3.03,
-    "mp4_mb": 3.73
-  },
-  {
-    "algorithm": "dijkstra",
-    "outcome": "COMPLETE",
-    "frames": 861,
-    "travelled_m": 40.76,
-    "gif": "docs/media/run_sidebyside/dijkstra.gif",
-    "mp4": "docs/media/run_sidebyside/dijkstra.mp4",
-    "gif_mb": 2.78,
-    "mp4_mb": 2.68
-  },
-  {
-    "algorithm": "gbfs",
-    "outcome": "COMPLETE",
-    "frames": 891,
-    "travelled_m": 40.48,
-    "gif": "docs/media/run_sidebyside/gbfs.gif",
-    "mp4": "docs/media/run_sidebyside/gbfs.mp4",
-    "gif_mb": 3.29,
-    "mp4_mb": 2.97
-  },
-  {
-    "algorithm": "jps",
-    "outcome": "COMPLETE",
-    "frames": 1925,
-    "travelled_m": 102.01,
-    "gif": "docs/media/run_sidebyside/jps.gif",
-    "mp4": "docs/media/run_sidebyside/jps.mp4",
-    "gif_mb": 2.57,
-    "mp4_mb": 5.73
-  },
-  {
-    "algorithm": "theta_star",
-    "outcome": "COMPLETE",
-    "frames": 2161,
-    "travelled_m": 149.02,
-    "gif": "docs/media/run_sidebyside/theta_star.gif",
-    "mp4": "docs/media/run_sidebyside/theta_star.mp4",
-    "gif_mb": 2.05,
-    "mp4_mb": 3.15
-  },
-  {
     "algorithm": "weighted_astar",
     "outcome": "COMPLETE",
-    "frames": 686,
-    "travelled_m": 29.68,
+    "last_state": "COMPLETE",
+    "frames": 925,
+    "travelled_m": 55.2,
+    "rviz_frames_captured": 925,
+    "rviz_frames_missing": 0,
     "gif": "docs/media/run_sidebyside/weighted_astar.gif",
     "mp4": "docs/media/run_sidebyside/weighted_astar.mp4",
-    "gif_mb": 3.15,
-    "mp4_mb": 2.45
+    "gif_mb": 2.27,
+    "mp4_mb": 2.51
   }
 ]

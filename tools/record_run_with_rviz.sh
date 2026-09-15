@@ -62,10 +62,36 @@ teardown() {
   sleep 3
 }
 
+# Kill anything of ours left over from an interrupted earlier run before
+# starting. This is not tidiness: an orphaned race_metrics sits at nearly a full
+# core, and under that load the lifecycle transitions time out, planner_server
+# never activates, and the run ends in SEARCH_EXHAUSTED with the robot never
+# having moved. The patterns deliberately name only this project's nodes and
+# this camera's bridge, so a simulation belonging to something else is untouched.
+cleanup_orphans() {
+  pkill -9 -f 'Sim2Real-AlgoBench/install/race_control' 2>/dev/null
+  pkill -9 -f 'Sim2Real-AlgoBench/install/race_vision' 2>/dev/null
+  pkill -9 -f 'top_view@sensor_msgs' 2>/dev/null
+  pkill -9 -f 'live_run.rviz' 2>/dev/null
+  sleep 2
+}
+cleanup_orphans
+
 # Bringing the stack up is not always successful first time: AMCL sometimes
 # never takes its initial pose, so it never publishes map -> odom, the global
-# costmap refuses to activate, and the run cannot start. Retrying is cheaper
-# than diagnosing it, and a retry is invisible in the output.
+# costmap refuses to activate, planner_server fails to configure and the
+# navigation lifecycle manager aborts. bt_navigator is then left inactive, every
+# goal is rejected, and the mission runs out its search budget without the robot
+# ever moving. Retrying is cheaper than diagnosing it per run.
+#
+# The readiness test has to name the *navigation* manager. Both managers print
+# "Managed nodes are active", so matching that string alone is satisfied by the
+# localization manager while navigation has already aborted - which is exactly
+# how a run can look ready and then reject every goal.
+aborted() {
+  grep -qa "Aborting bringup" "$LOGS/stack.log" 2>/dev/null
+}
+
 up=0
 for attempt in 1 2 3; do
   echo "[$(date +%T)] $ALGO: launching the competition stack (attempt $attempt)"
@@ -76,8 +102,12 @@ for attempt in 1 2 3; do
   PGID=$(ps -o pgid= -p $! | tr -d ' ')
 
   for _ in $(seq 1 110); do
-    if grep -qa "waiting for one-button start" "$LOGS/stack.log" 2>/dev/null &&
-       grep -qa "Managed nodes are active" "$LOGS/stack.log" 2>/dev/null &&
+    if aborted; then
+      echo "[$(date +%T)] $ALGO: navigation bringup aborted; restarting"
+      break
+    fi
+    if grep -qa "lifecycle_manager_navigation\].*Managed nodes are active" "$LOGS/stack.log" 2>/dev/null &&
+       grep -qa "waiting for one-button start" "$LOGS/stack.log" 2>/dev/null &&
        grep -qa "initialPoseReceived" "$LOGS/stack.log" 2>/dev/null; then
       up=1; break
     fi

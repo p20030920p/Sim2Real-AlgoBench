@@ -72,6 +72,8 @@ class RunRecorder(Node):
         self.plan = None
         self.plan_drawn = False
         self.rviz_id = None
+        self.rviz_hits = 0
+        self.rviz_misses = 0
         self.frames = []
         self.count = 0
 
@@ -171,13 +173,22 @@ class RunRecorder(Node):
                 if self.latest_image is None or time.time() < next_shot:
                     continue
 
-                # The top camera's image is rotated 180 degrees against the
-                # world frame the map, the path and RViz all use, so the two
-                # halves would show the arena the opposite way up. Rotating the
-                # camera image is the fix; measured, not guessed: a marker at
-                # world (6.65, 4.00) renders at pixel (159, 153) while the
-                # camera is over the arena centre (240, 240).
-                left = cv2.rotate(self.latest_image.copy(), cv2.ROTATE_180)
+                # The top camera's image axes are not the world axes the map,
+                # the path and RViz use, so the two halves would show the arena
+                # turned against each other. Measured by putting a 1.2 m marker
+                # at a known world point, one at a time, and differencing the
+                # frame to find it (the camera is over the arena centre, so its
+                # own position is image (240, 240)):
+                #
+                #   world +X 3 m  ->  offset ( -0.5, -82.1)   image up
+                #   world -X 3 m  ->  offset ( -9.0, +81.5)   image down
+                #   world +Y 3 m  ->  offset (-82.5,  +8.0)   image left
+                #
+                # 82 px for 3 m is 27.4 px/m, against 27.2 predicted from the
+                # camera height and field of view, so the measurement is sound.
+                # A quarter turn clockwise puts +X right and +Y up, which is the
+                # orientation the map and RViz are drawn in.
+                left = cv2.rotate(self.latest_image.copy(), cv2.ROTATE_90_CLOCKWISE)
                 right = None
                 try:
                     if self.rviz_id is None:
@@ -189,6 +200,12 @@ class RunRecorder(Node):
                             cv2.COLOR_RGB2BGR)
                 except Exception:                      # noqa: BLE001
                     right = None
+                if right is None:
+                    # Counted and reported: a failed grab silently produces a
+                    # half-black clip, which is worse than no clip.
+                    self.rviz_misses += 1
+                else:
+                    self.rviz_hits += 1
 
                 left = self.label(left)
                 height = left.shape[0]
@@ -247,7 +264,9 @@ def main() -> int:
                        'outcome': node.outcome}, handle)
         meta = {'algorithm': args.algorithm, 'frames': node.count,
                 'outcome': node.outcome, 'last_state': node.state,
-                'plan_poses': 0 if node.plan is None else len(node.plan)}
+                'plan_poses': 0 if node.plan is None else len(node.plan),
+                'rviz_frames_captured': node.rviz_hits,
+                'rviz_frames_missing': node.rviz_misses}
         with open(os.path.join(args.out_dir, 'meta.json'), 'w',
                   encoding='utf-8') as handle:
             json.dump(meta, handle, indent=2)

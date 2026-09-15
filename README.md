@@ -78,24 +78,26 @@ path in red, and the robot model. Nothing is composited or re-timed: both halves
 come from one run, and the state in the header comes from `/race/state`.
 
 The two halves have to be turned to the same angle or the comparison is
-worthless, and the top camera is not aligned with the world frame that the map
-and RViz use: **its image is rotated 180° against it**.
+worthless, and the top camera's image axes are not the world axes the map, the
+path and RViz use. A 1.2 m marker was placed at a known world point, one at a
+time, and located by differencing the camera frame against the frame before it,
+so nothing is inferred from colour or from what looks plausible:
 
-That is measured, not assumed. Markers were spawned at known world points and
-located in the camera image:
-
-| marker world | camera pixel |
+| marker, 3 m from the camera in | offset from image centre |
 | :--- | :--- |
-| (3.65, 3.00) — the camera's own position, +2 m in y | (240, 180) |
-| (5.65, 1.00) — +2 m in x | (62, 113) |
-| (8.07, 7.53) — the start pose | (118, 245) |
+| world **+X** | ( −0.5, −82.1) — image up |
+| world **−X** | ( −9.0, +81.5) — image down |
+| world **+Y** | (−82.5, +8.0) — image left |
 
-The camera hangs over the arena centre and its image centre is (240, 240), so
-the mapping is `px = 240 − 27.1·(wy − 1.0)`, `py = 240 − 27.1·(wx − 3.65)`: both
-world axes run backwards in the image, which is a half turn. Rotating the camera
-half by 180° then reproduces the north-up map — unknown region in the top-left,
-the same internal walls, the same corner geometry. The recorder applies that
-rotation, and nothing else.
+The camera hangs over the arena centre, which is image (240, 240). 82 px for
+3 m is 27.4 px/m against 27.2 predicted from the camera height and field of
+view, so the measurement is sound, and the three points agree with each other.
+
+World +X is therefore image up and world +Y is image left, which is a quarter
+turn away from the orientation the map and RViz are drawn in. Rotating the
+camera half 90° clockwise puts +X right and +Y up. Checked a second way: the car
+sits at the known pose (8.0727, 7.5312) during the test, which that orientation
+places at (361, 61), and it is measured at (359.5, 62.2) — about 2 px out.
 
 ```bash
 tools/record_all_planners.sh /tmp/planners        # every registered planner

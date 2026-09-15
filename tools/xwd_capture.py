@@ -75,21 +75,38 @@ def read_xwd(path: str) -> Image.Image:
 
 
 def find_window(pattern: str) -> str | None:
-    """Return the id of the first mapped window whose name contains pattern."""
+    """Return the id of the client window whose name contains pattern.
+
+    The same title appears twice in the tree on this desktop: once for the
+    compositor's decoration frame and once for the real client. Grabbing the
+    decoration frame fails with BadMatch on X_GetImage - which is why a
+    recording can come out with one half completely blank - so the client
+    window has to be preferred explicitly rather than taking the first match.
+    """
     try:
         tree = subprocess.run(["xwininfo", "-root", "-tree"],
                               capture_output=True, text=True, timeout=10).stdout
     except Exception:
         return None
 
+    fallback = None
     for line in tree.splitlines():
         if pattern.lower() not in line.lower():
             continue
         # "0x4a00007 \"RViz\": (\"rviz2\" \"RViz\")  1200x800+10+10  +10+10"
         parts = line.strip().split()
-        if parts and parts[0].startswith("0x"):
-            return parts[0]
-    return None
+        if not parts or not parts[0].startswith("0x"):
+            continue
+        lowered = line.lower()
+        window_id = parts[0]
+        if "mutter" in lowered or "decoration" in lowered:
+            continue
+        # Prefer the window whose WM_CLASS names the application itself.
+        if f'("{pattern.lower()}"' in lowered:
+            return window_id
+        if fallback is None:
+            fallback = window_id
+    return fallback
 
 
 def grab(window_id: str | None, out: str) -> None:
