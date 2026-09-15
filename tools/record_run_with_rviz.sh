@@ -62,23 +62,35 @@ teardown() {
   sleep 3
 }
 
-echo "[$(date +%T)] $ALGO: launching the competition stack"
-setsid ros2 launch race_navigation competition.launch.py \
-    headless:=true stress:=false nav_rviz:=false render_engine:=ogre \
-    > "$LOGS/stack.log" 2>&1 &
-PGID=$(ps -o pgid= -p $! | tr -d ' ')
-
+# Bringing the stack up is not always successful first time: AMCL sometimes
+# never takes its initial pose, so it never publishes map -> odom, the global
+# costmap refuses to activate, and the run cannot start. Retrying is cheaper
+# than diagnosing it, and a retry is invisible in the output.
 up=0
-for _ in $(seq 1 120); do
-  if grep -qa "waiting for one-button start" "$LOGS/stack.log" 2>/dev/null &&
-     grep -qa "Managed nodes are active" "$LOGS/stack.log" 2>/dev/null &&
-     grep -qa "initialPoseReceived" "$LOGS/stack.log" 2>/dev/null; then
-    up=1; break
-  fi
-  sleep 2
+for attempt in 1 2 3; do
+  echo "[$(date +%T)] $ALGO: launching the competition stack (attempt $attempt)"
+  rm -f "$LOGS/stack.log"
+  setsid ros2 launch race_navigation competition.launch.py \
+      headless:=true stress:=false nav_rviz:=false render_engine:=ogre \
+      > "$LOGS/stack.log" 2>&1 &
+  PGID=$(ps -o pgid= -p $! | tr -d ' ')
+
+  for _ in $(seq 1 110); do
+    if grep -qa "waiting for one-button start" "$LOGS/stack.log" 2>/dev/null &&
+       grep -qa "Managed nodes are active" "$LOGS/stack.log" 2>/dev/null &&
+       grep -qa "initialPoseReceived" "$LOGS/stack.log" 2>/dev/null; then
+      up=1; break
+    fi
+    sleep 2
+  done
+  [ "$up" = 1 ] && break
+
+  echo "[$(date +%T)] $ALGO: stack did not become ready, retrying"
+  kill -TERM -- "-$PGID" 2>/dev/null; sleep 6
+  kill -KILL -- "-$PGID" 2>/dev/null; sleep 8
 done
 if [ "$up" != 1 ]; then
-  echo "[$(date +%T)] $ALGO: stack never became ready"; teardown; exit 1
+  echo "[$(date +%T)] $ALGO: giving up after $attempt attempts"; teardown; exit 1
 fi
 sleep 12
 

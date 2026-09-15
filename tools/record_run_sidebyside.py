@@ -164,10 +164,6 @@ class RunRecorder(Node):
             while time.time() < deadline:
                 rclpy.spin_once(self, timeout_sec=0.03)
 
-                # Draw the path the first time one is available.
-                if self.plan is not None and not self.plan_drawn:
-                    self.draw_plan_into_world()
-
                 if self.outcome == 'COMPLETE' and finished_at is None:
                     finished_at = time.time()
                 if finished_at is not None and time.time() - finished_at > grace:
@@ -175,7 +171,13 @@ class RunRecorder(Node):
                 if self.latest_image is None or time.time() < next_shot:
                     continue
 
-                left = self.latest_image.copy()
+                # The top camera's image is rotated 180 degrees against the
+                # world frame the map, the path and RViz all use, so the two
+                # halves would show the arena the opposite way up. Rotating the
+                # camera image is the fix; measured, not guessed: a marker at
+                # world (6.65, 4.00) renders at pixel (159, 153) while the
+                # camera is over the arena centre (240, 240).
+                left = cv2.rotate(self.latest_image.copy(), cv2.ROTATE_180)
                 right = None
                 try:
                     if self.rviz_id is None:
@@ -237,7 +239,6 @@ def main() -> int:
     try:
         node.run(args.seconds)
     finally:
-        node.draw_trail_into_world()
         with open(os.path.join(args.out_dir, 'run.json'), 'w',
                   encoding='utf-8') as handle:
             json.dump({'algorithm': args.algorithm,

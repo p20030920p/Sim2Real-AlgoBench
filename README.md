@@ -106,23 +106,60 @@ ros2 topic echo /race/state                                              # watch
 ### The task, with the planner's plan beside it
 
 Gazebo on the left, RViz on the right, one complete run from the start signal to
-the 3-second hold. The left half is the simulator's own top-down camera; the
-right half is RViz drawing the same moment from the same topics — the saved map,
-the global costmap, the live LiDAR scan, the planned path in red, and the robot
-model. Nothing is composited or re-timed: both halves are captured from one run,
-and the state in the header comes from `/race/state`.
+the 3-second hold. The left half is the simulator's own top-down camera, with no
+overlay at all; the right half is RViz drawing the same moment from the same
+topics — the saved map, the global costmap, the live LiDAR scan, the planned
+path in red, and the robot model. Nothing is composited or re-timed: both halves
+come from one run, and the state in the header comes from `/race/state`.
 
-<p align="center">
-  <img src="docs/media/run_sidebyside/astar.gif" width="820" alt="One autonomous run: Gazebo on the left, the navigation stack in RViz on the right, same moment"/>
-</p>
+The two halves have to be turned to the same angle or the comparison is
+worthless, and the top camera is not aligned with the world frame that the map
+and RViz use: **its image is rotated 180° against it**.
 
-<p align="center">
-  <sub><a href="docs/media/run_sidebyside/astar.mp4">Download the full run (MP4, 4 fps, A* as the global planner)</a></sub>
-</p>
+That is measured, not assumed. Markers were spawned at known world points and
+located in the camera image:
+
+| marker world | camera pixel |
+| :--- | :--- |
+| (3.65, 3.00) — the camera's own position, +2 m in y | (240, 180) |
+| (5.65, 1.00) — +2 m in x | (62, 113) |
+| (8.07, 7.53) — the start pose | (118, 245) |
+
+The camera hangs over the arena centre and its image centre is (240, 240), so
+the mapping is `px = 240 − 27.1·(wy − 1.0)`, `py = 240 − 27.1·(wx − 3.65)`: both
+world axes run backwards in the image, which is a half turn. Rotating the camera
+half by 180° then reproduces the north-up map — unknown region in the top-left,
+the same internal walls, the same corner geometry. The recorder applies that
+rotation, and nothing else.
+
+```bash
+tools/record_all_planners.sh /tmp/planners        # every registered planner
+```
 
 The point of showing both is that neither half is sufficient alone. Gazebo shows
 what the robot did; RViz shows what the navigation stack believed, and the path
 it committed to. When they disagree, that is the interesting case.
+
+Every registered planner, same task, same everything else:
+
+| Global planner | Outcome | Driven | Clip |
+| :--- | :---: | ---: | :---: |
+| **Weighted A\*** | `COMPLETE` | 29.7 m | ![weighted_astar](docs/media/run_sidebyside/weighted_astar.gif) |
+| **A\*** | `COMPLETE` | 36.5 m | ![astar](docs/media/run_sidebyside/astar.gif) |
+| **Dijkstra** | `COMPLETE` | 40.8 m | ![dijkstra](docs/media/run_sidebyside/dijkstra.gif) |
+| **GBFS** | `COMPLETE` | 40.5 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
+| **D\* Lite** | `COMPLETE` | 58.7 m | ![d_star_lite](docs/media/run_sidebyside/d_star_lite.gif) |
+| **Theta\*** | `COMPLETE` | 149.0 m | ![theta_star](docs/media/run_sidebyside/theta_star.gif) |
+| **JPS** | `COMPLETE` | 102.0 m | ![jps](docs/media/run_sidebyside/jps.gif) |
+
+All seven complete the task, which is the honest result and also a warning about
+reading too much into a single number. The distance driven is not the planner's
+path quality: it counts every replan and every viewpoint revisit the mission
+asked for, and Theta\*'s 149 m is that, not a bad path. These clips are for
+seeing the behaviour, not for ranking the algorithms — the offline table above,
+measured on one planning call, is the ranking.
+
+The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`.
 
 ### Search shape, and how to read the colours
 
