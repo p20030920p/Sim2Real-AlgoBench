@@ -24,5 +24,18 @@
     "mp4": "docs/media/run_sidebyside/astar.mp4",
     "gif_mb": 2.52,
     "mp4_mb": 9.28
+  },
+  {
+    "algorithm": "dijkstra",
+    "outcome": "COMPLETE",
+    "last_state": "COMPLETE",
+    "frames": 692,
+    "travelled_m": 33.1,
+    "rviz_frames_captured": 692,
+    "rviz_frames_missing": 0,
+    "gif": "docs/media/run_sidebyside/dijkstra.gif",
+    "mp4": "docs/media/run_sidebyside/dijkstra.mp4",
+    "gif_mb": 2.47,
+    "mp4_mb": 1.92
   }
 ]
