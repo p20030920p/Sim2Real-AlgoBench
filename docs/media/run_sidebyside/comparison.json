@@ -63,5 +63,18 @@
     "mp4": "docs/media/run_sidebyside/d_star_lite.mp4",
     "gif_mb": 2.48,
     "mp4_mb": 1.87
+  },
+  {
+    "algorithm": "theta_star",
+    "outcome": "COMPLETE",
+    "last_state": "COMPLETE",
+    "frames": 1208,
+    "travelled_m": 76.0,
+    "rviz_frames_captured": 1208,
+    "rviz_frames_missing": 0,
+    "gif": "docs/media/run_sidebyside/theta_star.gif",
+    "mp4": "docs/media/run_sidebyside/theta_star.mp4",
+    "gif_mb": 2.48,
+    "mp4_mb": 3.31
   }
 ]
