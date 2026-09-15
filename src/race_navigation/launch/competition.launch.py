@@ -1,5 +1,8 @@
 """Complete legal one-button race: known map, AMCL, Nav2 search and visual finish."""
 
+import os
+import subprocess
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
 from launch.conditions import IfCondition
@@ -8,6 +11,40 @@ from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+# Where the algorithm-swapped parameter file is generated. Outside the install
+# tree on purpose: it is a per-run artefact, not something to package.
+GENERATED_PARAMS_DIR = '/tmp/race_nav2_params'
+
+
+def _params_for_algorithm(algorithm, base_params):
+    """Generate a nav2_params file whose global planner is `algorithm`.
+
+    Only the planner_server block differs from the race baseline, so two runs
+    with different algorithms share the costmap, controller, AMCL settings and
+    behaviour tree, and are therefore comparable. Returns the base file
+    unchanged when no algorithm was requested.
+    """
+    if not algorithm:
+        return base_params
+
+    os.makedirs(GENERATED_PARAMS_DIR, exist_ok=True)
+    out = os.path.join(GENERATED_PARAMS_DIR, f'nav2_{algorithm}.yaml')
+    # Resolve through symlinks: this file is usually loaded from the install
+    # tree, but the helper it needs lives in the repository.
+    launch_dir = os.path.dirname(os.path.realpath(__file__))
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(launch_dir)))
+    tool = os.path.join(repo_root, 'tools', 'make_planner_params.py')
+    if not os.path.exists(tool):
+        raise RuntimeError(
+            f'cannot switch planner: {tool} is missing '
+            '(it lives in the repository, not in the install tree)')
+
+    subprocess.run(
+        ['python3', tool, '--algorithm', algorithm, '--out', out,
+         '--base', base_params],
+        check=True, capture_output=True, text=True)
+    return out
+
 
 def generate_launch_description():
     nav_share = FindPackageShare('race_navigation')
@@ -15,8 +52,15 @@ def generate_launch_description():
     nav2_share = FindPackageShare('nav2_bringup')
     control_share = FindPackageShare('race_control')
     use_sim_time = LaunchConfiguration('use_sim_time')
-    params = LaunchConfiguration('params_file')
     map_file = LaunchConfiguration('map')
+    algorithm = os.environ.get('RACE_GLOBAL_PLANNER', '')
+    params = _params_for_algorithm(
+        algorithm, os.path.normpath(os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            '..', 'config', 'nav2_params.yaml')))
+    if algorithm:
+        print(f'[competition] global planner overridden to {algorithm!r}; '
+              f'params: {params}')
 
     simulation = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -62,8 +106,7 @@ def generate_launch_description():
         DeclareLaunchArgument('spawn_yaw', default_value='-1.5708'),
         DeclareLaunchArgument('map', default_value=PathJoinSubstitution([
             nav_share, 'maps', 'race_map.yaml'])),
-        DeclareLaunchArgument('params_file', default_value=PathJoinSubstitution([
-            nav_share, 'config', 'nav2_params.yaml'])),
+        DeclareLaunchArgument('params_file', default_value=params),
         DeclareLaunchArgument('rviz_config', default_value=PathJoinSubstitution([
             nav_share, 'rviz', 'nav2_default_view.rviz'])),
         simulation,
@@ -72,7 +115,16 @@ def generate_launch_description():
              parameters=[{'use_sim_time': use_sim_time}]),
         Node(package='race_control', executable='race_metrics',
              name='race_metrics', output='screen',
-             parameters=[{'use_sim_time': use_sim_time}]),
+             parameters=[{
+                 'use_sim_time': use_sim_time,
+                 # Default in the node is an absolute path from the machine it
+                 # was written on; point it at this repository instead so the
+                 # reports land next to the code that produced them.
+                 'report_dir': os.environ.get('RACE_REPORT_DIR', os.path.normpath(
+                     os.path.join(
+                         os.path.dirname(os.path.realpath(__file__)),
+                         '..', '..', '..', '..', 'reports'))),
+             }]),
         Node(
             package='ros_gz_bridge', executable='parameter_bridge',
             name='gz_moving_obstacle_bridge', output='screen',

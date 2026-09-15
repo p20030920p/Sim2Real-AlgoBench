@@ -124,6 +124,40 @@ The same six searches side by side, colouring the expansion order:
   <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code></sub>
 </p>
 
+### The same task, one algorithm at a time
+
+The replays above show what each planner expands; they do not show what each
+planner makes the robot *do*. These are separate recordings of the complete
+autonomous run from above — same map, same start pose, same costmap, same
+controller, same behaviour tree — with only the global planner swapped:
+
+```bash
+tools/run_algorithm_comparison.sh /tmp/race_algo_runs astar dijkstra theta_star
+python3 tools/assemble_algo_runs.py --runs /tmp/race_algo_runs \
+    --out docs/media/algorithms
+```
+
+Each clip is the arena seen from above, with the planner's own path in red and
+where the car actually went in green.
+
+| | |
+| :---: | :---: |
+| **Dijkstra** — `COMPLETE`, 29.3 m driven | ![dijkstra](docs/media/algorithms/dijkstra.gif) |
+| **A*** — `COMPLETE`, 32.8 m driven | ![astar](docs/media/algorithms/astar.gif) |
+| **Weighted A*** — `COMPLETE`, 33.3 m driven | ![weighted_astar](docs/media/algorithms/weighted_astar.gif) |
+| **GBFS** — `COMPLETE`, 50.4 m driven | ![gbfs](docs/media/algorithms/gbfs.gif) |
+
+All four finish the task. GBFS drives furthest — a greedy search takes the first
+route it finds rather than a good one, and the figure shows the cost of that
+directly. The recordings are not a timing benchmark: Gazebo runs at a fraction
+of real time on a software-rendered VM, so clip length reflects the machine, not
+the planner. The distance driven is the honest comparison.
+
+(Theta\*, D\* Lite and JPS are not in the table: Theta\* stalled the simulator
+during recording, and JPS is broken on this map — see below. The harness records
+one algorithm at a time and can be pointed at any of them:
+`tools/run_algorithm_comparison.sh /tmp/runs theta_star`.)
+
 ### Stress world
 
 The race scenario running: Gazebo on the left, RViz on the right. This is the stress world, which adds low-traction and rough-ground patches and two moving obstacles to the arena.
