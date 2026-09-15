@@ -79,15 +79,15 @@
   },
   {
     "algorithm": "jps",
-    "outcome": null,
-    "last_state": "NAVIGATING_TO_SEARCH_VIEWPOINT",
-    "frames": 3001,
-    "travelled_m": 214.0,
-    "rviz_frames_captured": 3001,
+    "outcome": "COMPLETE",
+    "last_state": "COMPLETE",
+    "frames": 2464,
+    "travelled_m": 143.9,
+    "rviz_frames_captured": 2464,
     "rviz_frames_missing": 0,
     "gif": "docs/media/run_sidebyside/jps.gif",
     "mp4": "docs/media/run_sidebyside/jps.mp4",
-    "gif_mb": 2.48,
-    "mp4_mb": 8.24
+    "gif_mb": 2.49,
+    "mp4_mb": 6.75
   }
 ]
