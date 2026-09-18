@@ -18,8 +18,8 @@ namespace algo_core
 ///
 /// Searches backwards from the goal and repairs its solution incrementally when
 /// edge costs change. The reason it earns its place in this library is that a
-/// Nav2 costmap changes on every cycle — moving obstacles in the stress world
-/// are exactly the situation D* Lite was designed for.
+/// Nav2 costmap changes on every cycle — moving obstacles in the
+/// dynamic-obstacle world are exactly the situation D* Lite was designed for.
 ///
 /// The incremental behaviour only happens if the same instance is reused across
 /// calls, so the planner keeps its g/rhs arrays, its queue and the previous

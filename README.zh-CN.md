@@ -129,16 +129,12 @@ ros2 topic echo /race/state               # 观察状态机跑完
   <sub><a href="docs/media/search_2d.mp4">下载（MP4）</a> &nbsp;·&nbsp; 用 <code>tools/render_planning_demo.py</code> 渲染</sub>
 </p>
 
-### 压力世界
+### 动态障碍世界
 
-比赛场景运行中：左侧 Gazebo，右侧 RViz。这是压力世界，场地中额外包含低附着地面、粗糙地面和两个移动障碍。
-
-<p align="center">
-  <img src="docs/media/dynamic_obstacle.gif" width="720" alt="压力世界：左侧 Gazebo，右侧 RViz 中重新规划的路径"/>
-</p>
+同一赛道加两个移动障碍的版本，由 `stress:=true` 选择，加载 `competition_stress.world` 而不是 `competition_world.world`。上面对比统一传 `stress:=false`，让七种规划器面对同一场地与同一张代价地图。移动障碍运行的原片保留为下载：
 
 <p align="center">
-  <sub><a href="docs/media/dynamic_obstacle.mp4">下载原片（MP4，1920 × 1080，60 fps）</a> &nbsp;·&nbsp; 用 <code>python3 tools/make_gif.py</code> 重新生成</sub>
+  <sub><a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4（1920 × 1080，60 fps）</a> &nbsp;·&nbsp; 用 <code>python3 tools/make_gif.py</code> 转 GIF</sub>
 </p>
 
 ## 运行截图
@@ -146,8 +142,8 @@ ros2 topic echo /race/state               # 观察状态机跑完
 | SLAM 建图 | 地图保存 |
 | :---: | :---: |
 | ![SLAM 建图过程](docs/images/01_mapping.png) | ![保存的 PGM 栅格地图](docs/images/02_map_saved.png) |
-| **压力世界** | **TF 坐标树** |
-| ![动态障碍与变化地面光照测试](docs/images/05_stress_world.png) | ![机器人 TF 坐标树](docs/images/06_tf_tree.png) |
+| **动态障碍世界** | **TF 坐标树** |
+| ![场地中的两个移动障碍](docs/images/05_stress_world.png) | ![机器人 TF 坐标树](docs/images/06_tf_tree.png) |
 
 ## 快速开始
 
@@ -191,7 +187,7 @@ src/
 ├── algo_nav2_plugins/    # Nav2 插件适配层
 ├── algo_bringup/         # 算法索引、参数、行为树
 ├── race_description/     # URDF、网格、传感器、ros2_control
-├── race_gazebo/          # 比赛地图、普通世界与压力世界
+├── race_gazebo/          # 比赛地图、标称世界与动态障碍世界
 ├── race_bringup/         # Gazebo、机器人、控制器、桥接、RViz
 ├── race_navigation/      # SLAM、AMCL、Nav2 配置、启动入口
 ├── race_vision/          # 绿色 A4 标志识别

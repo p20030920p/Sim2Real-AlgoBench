@@ -251,6 +251,6 @@ ros2 run ros_gz_sim create -file cam.sdf -name topcam \
   -x 3.65 -y 1.0 -z 13.0 -P 1.5708      # -P 是俯仰角，+90° 表示朝下
 ```
 
-**相机在 stress 世界里不出图**，nominal 世界正常。需要录制时用 `stress:=false`。
+**相机在动态障碍世界（`stress:=true`）里不出图**，标称世界（`stress:=false`）正常。需要录制时用 `stress:=false`。
 
 **俯视相机参数**：位于场地中心上方 13 m、俯仰角 +90°、水平视场 1.396 rad，可完整覆盖 14.7 m 见方的比赛场地。

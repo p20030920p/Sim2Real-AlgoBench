@@ -162,16 +162,12 @@ under each panel, not the colour — A\* expands 26,442 cells against D\* Lite's
   <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code></sub>
 </p>
 
-### Stress world
+### Dynamic-obstacle world
 
-The race scenario running: Gazebo on the left, RViz on the right. This is the stress world, which adds low-traction and rough-ground patches and two moving obstacles to the arena.
-
-<p align="center">
-  <img src="docs/media/dynamic_obstacle.gif" width="720" alt="Stress-world run: Gazebo on the left, the replanned path in RViz on the right"/>
-</p>
+The same task with two moving obstacles sweeping the corridors. `stress:=true` selects it, loading `competition_stress.world` instead of `competition_world.world`. The planner comparison above passes `stress:=false`, so all seven planners face the same arena and the same costmap. The recording of a moving-obstacle run is kept here as a download:
 
 <p align="center">
-  <sub><a href="docs/media/dynamic_obstacle.mp4">Download the original (MP4, 1920 × 1080 at 60 fps)</a> &nbsp;·&nbsp; regenerate with <code>python3 tools/make_gif.py</code></sub>
+  <sub><a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4 (1920 × 1080 at 60 fps)</a> &nbsp;·&nbsp; convert with <code>python3 tools/make_gif.py</code></sub>
 </p>
 
 ## Gallery
@@ -179,8 +175,8 @@ The race scenario running: Gazebo on the left, RViz on the right. This is the st
 | SLAM mapping | Map saved |
 | :---: | :---: |
 | ![SLAM mapping](docs/images/01_mapping.png) | ![Saved PGM map](docs/images/02_map_saved.png) |
-| **Stress world** | **TF tree** |
-| ![Moving obstacles and varying illumination](docs/images/05_stress_world.png) | ![TF tree](docs/images/06_tf_tree.png) |
+| **Dynamic-obstacle world** | **TF tree** |
+| ![Two moving obstacles in the arena](docs/images/05_stress_world.png) | ![TF tree](docs/images/06_tf_tree.png) |
 
 ## Quick start
 
@@ -226,7 +222,7 @@ src/
 ├── algo_nav2_plugins/    # Nav2 plugin adapters
 ├── algo_bringup/         # algorithm index, parameters, behaviour trees
 ├── race_description/     # URDF, meshes, sensors, ros2_control
-├── race_gazebo/          # competition map, nominal and stress worlds
+├── race_gazebo/          # competition map, nominal and dynamic-obstacle worlds
 ├── race_bringup/         # Gazebo, robot, controllers, bridge, RViz
 ├── race_navigation/      # SLAM, AMCL, Nav2 configuration, launch entry
 ├── race_vision/          # green A4 marker detection

@@ -86,7 +86,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='false', description='Run Gazebo server only, without GUI.'),
         DeclareLaunchArgument('paused', default_value='false', description='Start Gazebo paused.'),
-        DeclareLaunchArgument('stress', default_value='false', description='Use the stress-test world.'),
+        DeclareLaunchArgument('stress', default_value='false',
+                              description='Load the dynamic-obstacle world (competition_stress.world) instead of the nominal one.'),
         DeclareLaunchArgument(
             'render_engine',
             default_value='ogre2',

@@ -66,7 +66,7 @@ planners:
   - index: 6
     id: "P6_d_star_lite"
     algorithm: "d_star_lite"
-    description: "D* Lite — incremental replanning. Use in the stress world with moving obstacles."
+    description: "D* Lite — incremental replanning. Suited to the dynamic-obstacle world."
     params: {cost_scale: 1.0}
 
   - index: 7
@@ -103,7 +103,7 @@ selection:
     NAVIGATING_TO_SEARCH_VIEWPOINT: "P1_astar"
     SCANNING_360_FOR_GREEN_BOARD: "P1_astar"
 
-  # Stress world (moving obstacles): prefer incremental replanning.
+  # Dynamic-obstacle world (two moving obstacles): prefer incremental replanning.
   stress_world: "P6_d_star_lite"
 
   # Long open traversals: greedier search pays off.

@@ -98,7 +98,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'nav_rviz', default_value='true',
             description='Start the Nav2 RViz window. Kept separate from the simulation rviz argument.'),
-        DeclareLaunchArgument('stress', default_value='true'),
+        DeclareLaunchArgument(
+            'stress', default_value='true',
+            description='Load the dynamic-obstacle world (two moving obstacles) instead of the nominal arena.'),
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('spawn_x', default_value='8.0727'),
         DeclareLaunchArgument('spawn_y', default_value='7.5312'),

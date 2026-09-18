@@ -17,7 +17,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='false'),
         DeclareLaunchArgument('rviz', default_value='true'),
-        DeclareLaunchArgument('stress', default_value='false'),
+        DeclareLaunchArgument('stress', default_value='false',
+                              description='Load the dynamic-obstacle world instead of the nominal arena.'),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(competition),
             launch_arguments={
