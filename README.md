@@ -31,20 +31,17 @@ The run ends when the marker is detected, not when a coordinate is reached. Perc
 
 ## Where this comes from
 
-The task, the arena and the scoring rules come from a comprehensive robotics competition. The same
-stack was run at the event on the physical vehicle and completed the task.
-
-What is in this repository is the simulation side of that stack: the arena, the task state machine,
-the metric set and the planner comparison, all of which run end to end in Gazebo. The hardware
-bring-up and calibration record is not published here.
-
-## Why the planners are separate
-
-The global planner is where a new idea usually lands, and comparing two of them normally means changing the stack around them. Here a planner is a subclass plus one registry entry: the Nav2 plugin, its parameters and one behaviour tree per algorithm are generated from that entry, so a comparison changes the algorithm and nothing else.
-
-Every run writes a JSON report, so two planners are compared on the same metrics instead of on two transcripts.
+The task, the arena and the scoring rules come from a comprehensive robotics competition, and the
+same stack was run at the event on the physical vehicle and completed the task. What is in this
+repository is the simulation side: the arena, the task state machine, the metric set and the planner
+comparison, all of which run end to end in Gazebo. The hardware bring-up and calibration record is
+not published here.
 
 ## Algorithm library
+
+A planner is a subclass plus one registry entry: the Nav2 plugin, its parameters and one behaviour
+tree per algorithm are generated from that entry, so a comparison changes the algorithm and nothing
+else. Every run writes a JSON report, so two planners are compared on the same metrics.
 
 The seven global planners are interchangeable Nav2 plugins. The active one is chosen by one line:
 
