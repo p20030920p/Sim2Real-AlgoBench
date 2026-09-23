@@ -6,7 +6,6 @@
 
 [![ROS 2](https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white)](https://docs.ros.org/en/jazzy/)
 [![Gazebo](https://img.shields.io/badge/Gazebo%20Sim-8-F58113?logo=gazebo&logoColor=white)](https://gazebosim.org/)
-[![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#算法插件库)
 
 [任务定义](#任务定义) &nbsp;•&nbsp; [算法插件库](#算法插件库) &nbsp;•&nbsp; [演示](#演示) &nbsp;•&nbsp; [快速开始](#快速开始) &nbsp;•&nbsp; [文档](#文档)
@@ -214,7 +213,3 @@ Nav2 插件和行为树由注册表生成，不需要改动其他文件。
 仿真、基线和原始中文文档由 [zfyyyyy](https://github.com/zfyyyyy) 编写。可互换规划器库（`algo_core`、`algo_nav2_plugins`、`algo_bringup`）、对比录像背后的录制与自检工具，以及英文文档是在其之上补充的。
 
 本项目使用 ROS 2、Nav2、SLAM Toolbox、Gazebo 和 OpenCV。若在研究中引用，请引用 Nav2（[Marathon 2, IROS 2020](https://arxiv.org/abs/2003.00368)）、SLAM Toolbox（[JOSS 6(61):2783, 2021](https://joss.theoj.org/papers/10.21105/joss.02783)）和 Theta\*（[JAIR 39:533–579, 2010](https://www.jair.org/index.php/jair/article/view/10676)）。
-
-## 许可证
-
-[MIT](LICENSE)。

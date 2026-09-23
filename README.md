@@ -6,7 +6,6 @@
 
 [![ROS 2](https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white)](https://docs.ros.org/en/jazzy/)
 [![Gazebo](https://img.shields.io/badge/Gazebo%20Sim-8-F58113?logo=gazebo&logoColor=white)](https://gazebosim.org/)
-[![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#algorithm-library)
 
 [The task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Demos](#demos) &nbsp;•&nbsp; [Quick start](#quick-start) &nbsp;•&nbsp; [Docs](#docs)
@@ -218,7 +217,3 @@ The plugins publish standard `geometry_msgs/Twist` including `linear.y`, so the 
 The simulation, the baseline and the original Chinese documentation were written by [zfyyyyy](https://github.com/zfyyyyy). The interchangeable planner library (`algo_core`, `algo_nav2_plugins`, `algo_bringup`), the recording and self-check tooling behind the comparison clips, and the English documentation were added on top of it.
 
 This repository uses ROS 2, Nav2, SLAM Toolbox, Gazebo and OpenCV. If you use this work, please cite Nav2 ([Marathon 2, IROS 2020](https://arxiv.org/abs/2003.00368)), SLAM Toolbox ([JOSS 6(61):2783, 2021](https://joss.theoj.org/papers/10.21105/joss.02783)) and Theta\* ([JAIR 39:533–579, 2010](https://www.jair.org/index.php/jair/article/view/10676)).
-
-## License
-
-[MIT](LICENSE).
