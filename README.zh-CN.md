@@ -48,21 +48,9 @@ active:
 | 6 | **D\* Lite** | 是 | 19 | 375 | 38.7 ms |
 | 7 | Nav2 Theta\* | 是 | 394 | — | — |
 
-A\* 展开 26,442 格，D\* Lite 只展开 375 格，因为后者在多次调用之间保留搜索状态，只修复发生变化的部分。Theta\* 返回 8 个路径点，A\* 返回 23 个，差别来自任意角规划消除的栅格阶梯。
-
-所有规划器同时保持加载，可以在每次请求时单独选择：
-
-| 选择方式 | 机制 |
-| :--- | :--- |
-| 按请求 | `ComputePathToPose` 带有 `planner_id` 字段 |
-| 按情况 | 每个算法一棵行为树，通过 `behavior_tree` 选择 |
-| 脱离 Nav2 | `algo_core::Registry::instance().create("theta_star")` |
-
-JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同样代价模型的 A\* 能找到路径，说明剪枝逻辑有误。请不要用它产生结果。
+JPS 已注册，但在这张地图上不可用：同样代价模型的 A\* 能找到路径，它却返回 `NO_VALID_PATH`。
 
 ## 演示
-
-同一赛题，逐个规划器，其余完全相同：
 
 | 全局规划器 | 结果 | 实际行驶 | 录像 |
 | :--- | :---: | ---: | :---: |
@@ -74,36 +62,15 @@ JPS 已注册但不可用。它在 race 地图上返回 `NO_VALID_PATH`，而同
 | **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
 | **JPS** | `COMPLETE` | 143.9 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-不同算法的演示如上。
+### 搜索形状
 
-MP4 在 `docs/media/run_sidebyside/<algorithm>.mp4`。直接复现一次运行：
-
-```bash
-export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
-ros2 launch race_navigation competition.launch.py headless:=true stress:=false
-python3 tools/send_start_signal.py        # 唯一启动信号
-ros2 topic echo /race/state               # 观察状态机跑完
-```
-
-### 搜索形状，以及颜色怎么读
-
-`docs/media/search_2d.gif` 把每个规划器展开格子的顺序做成动画，数据来自 `algo_plan_dump` 对真实搜索的记录。颜色表示展开顺序、且按面板各自归一化，所以两个面板出现同一种颜色只表示各自搜索到了同样的百分比；要比较工作量，看每个面板下方印的格数。
+`docs/media/search_2d.gif` 把每个规划器展开格子的顺序做成动画。颜色表示展开顺序、且按面板各自归一化，所以要比较工作量，看每个面板下方印的格数。
 
 ![六种规划器搜索并排对比](docs/media/search_2d.gif)
 
 <p align="center">
-  <sub><a href="docs/media/search_2d.mp4">下载（MP4）</a> &nbsp;·&nbsp; 用 <code>tools/render_planning_demo.py</code> 渲染</sub>
+  <sub><a href="docs/media/search_2d.mp4">下载（MP4）</a> &nbsp;·&nbsp; 用 <code>tools/render_planning_demo.py</code> 渲染 &nbsp;·&nbsp; <a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4（1920 × 1080，60 fps）</a> —— 同一赛道加两个移动障碍的版本，由 <code>stress:=true</code> 选择</sub>
 </p>
-
-### 动态障碍世界
-
-同一赛道加两个移动障碍的版本，由 `stress:=true` 选择，加载 `competition_stress.world` 而不是 `competition_world.world`。上面对比统一传 `stress:=false`，让七种规划器面对同一场地与同一张代价地图。移动障碍运行的原片保留为下载：
-
-<p align="center">
-  <sub><a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4（1920 × 1080，60 fps）</a></sub>
-</p>
-
-## 运行截图
 
 | SLAM 建图 | 地图保存 |
 | :---: | :---: |
@@ -121,16 +88,11 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install && source install/setup.bash
 ```
 
-运行完整任务：
+跑完整任务，或只跑规划器。两种方式都会加载全部已注册算法，`planner_index` 决定终端表格中显示哪一个为当前算法。
 
 ```bash
 ros2 launch race_navigation competition.launch.py headless:=false stress:=true
 ros2 run race_control race_start_key          # 按一次空格或回车
-ros2 topic echo /race/state                   # 观察状态机
-```
 
-只运行规划器，不起整个场景。此时所有已注册算法都会加载，`planner_index` 决定终端表格中显示哪一个为当前算法：
-
-```bash
 ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
 ```

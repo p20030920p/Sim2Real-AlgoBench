@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Algorithms](https://img.shields.io/badge/algorithms-7%20registered-brightgreen)](#algorithm-library)
 
-[Task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Demos](#demos) &nbsp;•&nbsp; [Quick start](#quick-start)
+[The task](#the-task) &nbsp;•&nbsp; [Algorithm library](#algorithm-library) &nbsp;•&nbsp; [Demos](#demos) &nbsp;•&nbsp; [Quick start](#quick-start)
 
 *English &nbsp;|&nbsp; [中文](README.zh-CN.md)*
 
@@ -48,21 +48,9 @@ active:
 | 6 | **D\* Lite** | yes | 19 | 375 | 38.7 ms |
 | 7 | Nav2 Theta\* | yes | 394 | — | — |
 
-A\* expands 26,442 cells; D\* Lite expands 375, because it keeps its search between calls and only repairs what changed. Theta\* returns 8 poses where A\* returns 23; the difference is the grid staircase that any-angle planning removes.
-
-All registered planners stay loaded at once, and any of them can be selected per request:
-
-| Selection | Mechanism |
-| :--- | :--- |
-| Per request | `ComputePathToPose` carries a `planner_id` field |
-| Per situation | one behaviour tree per algorithm, chosen through `behavior_tree` |
-| Outside Nav2 | `algo_core::Registry::instance().create("theta_star")` |
-
-JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map where A\* finds a route with the same cost model, so its pruning is incorrect. Do not use it for reported results.
+JPS is registered but does not work on the race map: it returns `NO_VALID_PATH` where A\* finds a route with the same cost model.
 
 ## Demos
-
-### Every registered planner, same task, same everything else
 
 | Global planner | Outcome | Driven | Clip |
 | :--- | :---: | ---: | :---: |
@@ -74,35 +62,15 @@ JPS is registered but does not work. It returns `NO_VALID_PATH` on the race map 
 | **GBFS** | `COMPLETE` | 178.9 m | ![gbfs](docs/media/run_sidebyside/gbfs.gif) |
 | **JPS** | `COMPLETE` | 143.9 m | ![jps](docs/media/run_sidebyside/jps.gif) |
 
-The clips are MP4 at `docs/media/run_sidebyside/<algorithm>.mp4`. To reproduce
-one run directly:
+### Search shape
 
-```bash
-export GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ros/jazzy/lib
-ros2 launch race_navigation competition.launch.py headless:=true stress:=false
-python3 tools/send_start_signal.py        # the one start signal
-ros2 topic echo /race/state               # watch it finish
-```
-
-### Search shape, and how to read the colours
-
-`docs/media/search_2d.gif` animates the order in which each planner expanded cells, from `algo_plan_dump`'s record of the real searches. The colour is expansion order, normalised per panel, so the same colour in two panels is the same fraction of two different searches; the cell count printed under each panel is the comparison.
+`docs/media/search_2d.gif` animates the order in which each planner expanded cells, from `algo_plan_dump`'s record of the real searches. The colour is expansion order, normalised per panel, so the cell count printed under each panel is the comparison.
 
 ![Six planner searches side by side](docs/media/search_2d.gif)
 
 <p align="center">
-  <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code></sub>
+  <sub><a href="docs/media/search_2d.mp4">Download (MP4)</a> &nbsp;·&nbsp; rendered with <code>tools/render_planning_demo.py</code> &nbsp;·&nbsp; <a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4 (1920 × 1080 at 60 fps)</a> — the same task with two moving obstacles, selected by <code>stress:=true</code></sub>
 </p>
-
-### Dynamic-obstacle world
-
-The same task with two moving obstacles sweeping the corridors. `stress:=true` selects it, loading `competition_stress.world` instead of `competition_world.world`. The planner comparison above passes `stress:=false`, so all seven planners face the same arena and the same costmap. The recording of a moving-obstacle run is kept here as a download:
-
-<p align="center">
-  <sub><a href="docs/media/dynamic_obstacle.mp4">dynamic_obstacle.mp4 (1920 × 1080 at 60 fps)</a></sub>
-</p>
-
-## Gallery
 
 | SLAM mapping | Map saved |
 | :---: | :---: |
@@ -120,16 +88,11 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install && source install/setup.bash
 ```
 
-Run the full task:
+Run the full task, or the planners alone. Every registered algorithm is loaded either way, and `planner_index` selects which one the terminal table reports as active.
 
 ```bash
 ros2 launch race_navigation competition.launch.py headless:=false stress:=true
 ros2 run race_control race_start_key          # press space or enter once
-ros2 topic echo /race/state                   # observe the state machine
-```
 
-Run the planners alone, without the scenario. Every registered algorithm is loaded, and `planner_index` selects which one the terminal table reports as active:
-
-```bash
 ros2 launch algo_bringup algo_planner_bench.launch.py planner_index:=4
 ```
